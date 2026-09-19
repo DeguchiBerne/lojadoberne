@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loja do Berne.exe - Relíquias & Geek</title>
-    <!-- Fonte pixelada dos anos 2000 / Arcade -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
     <style>
@@ -20,11 +19,7 @@
             --text-dim: #a0a0c0;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             background-color: var(--bg-color);
@@ -37,7 +32,6 @@
             padding: 10px;
         }
 
-        /* Janela Estilo Win98/XP Retro */
         .window {
             background: var(--panel-bg);
             border: 3px solid;
@@ -69,16 +63,14 @@
             cursor: pointer;
         }
 
-        .content {
-            padding: 20px;
-        }
+        .content { padding: 20px; }
 
-        /* Topo / Header */
         header {
             text-align: center;
             border-bottom: 2px dashed var(--neon-pink);
             padding-bottom: 15px;
             margin-bottom: 20px;
+            position: relative;
         }
 
         header h1 {
@@ -89,7 +81,25 @@
             margin-bottom: 10px;
         }
 
-        /* Letreiro Marquee */
+        /* Contador Retrô no Topo */
+        .visitor-counter {
+            background: #000;
+            border: 2px inset var(--border-light);
+            padding: 5px 10px;
+            display: inline-block;
+            font-family: 'VT323', monospace;
+            font-size: 22px;
+            color: var(--neon-yellow);
+            margin-top: 10px;
+        }
+
+        .visitor-counter span {
+            background: #111;
+            padding: 2px 6px;
+            border: 1px solid #333;
+            letter-spacing: 2px;
+        }
+
         .marquee-box {
             background: #000;
             border: 1px inset var(--border-light);
@@ -99,7 +109,32 @@
             margin-bottom: 20px;
         }
 
-        /* Grid de Produtos */
+        /* Categorias e Filtros */
+        .category-filter {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: #1f1f3a;
+            color: var(--text-dim);
+            border: 2px solid;
+            border-color: #fff #444 #444 #fff;
+            padding: 5px 15px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: #008080;
+            color: #fff;
+            border-color: #444 #fff #fff #444;
+        }
+
         .product-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -111,7 +146,6 @@
             border: 2px solid var(--border-light);
             padding: 15px;
             text-align: center;
-            position: relative;
             box-shadow: inset 2px 2px 0px rgba(255,255,255,0.05);
         }
 
@@ -122,6 +156,16 @@
             border: 1px solid var(--border-light);
             margin-bottom: 10px;
             filter: grayscale(20%) contrast(120%);
+        }
+
+        .product-category-tag {
+            font-size: 12px;
+            background: #2b2b50;
+            color: var(--neon-yellow);
+            padding: 2px 6px;
+            display: inline-block;
+            margin-bottom: 5px;
+            border: 1px solid #444;
         }
 
         .product-title {
@@ -143,7 +187,6 @@
             margin-bottom: 10px;
         }
 
-        /* Botões Estilo Retro */
         .retro-btn {
             background: #2b2b50;
             color: #fff;
@@ -163,11 +206,8 @@
             background: #1f1f3a;
         }
 
-        .retro-btn.add-cart {
-            background: #008080;
-        }
+        .retro-btn.add-cart { background: #008080; }
 
-        /* Seção do Carrinho / Proposta */
         .proposal-section {
             margin-top: 30px;
             border-top: 2px dashed var(--border-light);
@@ -207,18 +247,8 @@
             text-align: right;
         }
 
-        /* Formulário de Proposta */
-        .form-group {
-            margin-bottom: 12px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 16px;
-            margin-bottom: 3px;
-            color: var(--text-dim);
-        }
-
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 16px; margin-bottom: 3px; color: var(--text-dim); }
         .form-group input, .form-group textarea {
             width: 100%;
             padding: 8px;
@@ -229,12 +259,7 @@
             font-size: 16px;
         }
 
-        .send-proposal-btn {
-            background: #00aa00;
-            color: white;
-            font-size: 18px;
-            margin-top: 10px;
-        }
+        .send-proposal-btn { background: #00aa00; color: white; font-size: 18px; margin-top: 10px; }
 
         footer {
             text-align: center;
@@ -249,7 +274,6 @@
 <body>
 
     <div class="window">
-        <!-- Barra de Título Estilo Win98 -->
         <div class="title-bar">
             <span>C:\LOJA_DO_BERNE\VITRINE.EXE</span>
             <div class="title-bar-controls">
@@ -263,40 +287,26 @@
             <header>
                 <h1>Loja do Berne</h1>
                 <p>> O refúgio definitivo de relíquias Geek, Anos 80, 90 & Colecionáveis <</p>
+                <div class="visitor-counter">
+                    VISITANTE Nº: <span id="counterVal">000042</span>
+                </div>
             </header>
 
             <div class="marquee-box">
-                <marquee scrollamount="4">*** BEM-VINDO À VITRINE DO BERNE! SELECIONE OS ITENS DESEJADOS E MONTE SUA PROPOSTA DE NEGOCIAÇÃO ABAIXO! ***</marquee>
+                <marquee scrollamount="4">*** SELECIONE SEUS ITENS POR CATEGORIA E MONTE SUA PROPOSTA DE NEGOCIAÇÃO ABAIXO! ***</marquee>
             </div>
 
-            <!-- Vitrine de Produtos -->
-            <div class="product-grid">
-                <!-- Item 1 -->
-                <div class="product-card">
-                    <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=400" alt="Action Figure">
-                    <div class="product-title">Action Figure Raro</div>
-                    <div class="product-desc">Perfeito estado, caixa original lacrada. Franquia clássica dos anos 90.</div>
-                    <div class="product-price">R$ 180,00</div>
-                    <button class="retro-btn add-cart" onclick="adicionarItem('Action Figure Raro', 180.00)">Selecionar Item</button>
-                </div>
+            <!-- Filtros de Categoria -->
+            <div class="category-filter">
+                <button class="filter-btn active" onclick="filtrarCategoria('todos')">[ TODOS ]</button>
+                <button class="filter-btn" onclick="filtrarCategoria('Action Figures')">[ Action Figures ]</button>
+                <button class="filter-btn" onclick="filtrarCategoria('Retro Games')">[ Retro Games ]</button>
+                <button class="filter-btn" onclick="filtrarCategoria('Quadrinhos')">[ Quadrinhos & HQs ]</button>
+            </div>
 
-                <!-- Item 2 -->
-                <div class="product-card">
-                    <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400" alt="Cartucho Retro">
-                    <div class="product-title">Cartucho Classico 16-bit</div>
-                    <div class="product-desc">Item testado e funcionando perfeitamente. Relíquia pura!</div>
-                    <div class="product-price">R$ 120,00</div>
-                    <button class="retro-btn add-cart" onclick="adicionarItem('Cartucho Classico 16-bit', 120.00)">Selecionar Item</button>
-                </div>
-
-                <!-- Item 3 -->
-                <div class="product-card">
-                    <img src="https://images.unsplash.com/photo-1612287233002-91d0bc536af1?w=400" alt="Quadrinho Raro">
-                    <div class="product-title">HQ Colecionador Anos 80</div>
-                    <div class="product-desc">Edição histórica em ótimo estado de conservação para colecionadores exigentes.</div>
-                    <div class="product-price">R$ 90,00</div>
-                    <button class="retro-btn add-cart" onclick="adicionarItem('HQ Colecionador Anos 80', 90.00)">Selecionar Item</button>
-                </div>
+            <!-- Vitrine de Produtos (Categorizada) -->
+            <div class="product-grid" id="productGrid">
+                <!-- Os produtos são injetados via JavaScript para simular a leitura de dados -->
             </div>
 
             <!-- Seção de Proposta e Carrinho -->
@@ -308,36 +318,88 @@
                 </div>
 
                 <div class="total-display">
-                    Custo Total Estimado: <span id="cartTotal">R$ 0,00</span>
+                    Custo Total dos Itens: <span id="cartTotal">R$ 0,00</span>
                 </div>
 
-                <!-- Formulário para envio de proposta -->
                 <form id="proposalForm" onsubmit="enviarProposta(event)">
                     <div class="form-group">
                         <label>Seu Nome / Apelido:</label>
-                        <input type="text" id="propName" required placeholder="Ex: Colecionador99">
+                        <input type="text" id="propName" required placeholder="Ex: ColecionadorCuritiba">
                     </div>
                     <div class="form-group">
-                        <label>Seu E-mail ou WhatsApp (para autenticação/contato):</label>
-                        <input type="text" id="propContact" required placeholder="Ex: (41) 99999-9999 ou email@exemplo.com">
+                        <label>Seu WhatsApp ou E-mail (para autenticação):</label>
+                        <input type="text" id="propContact" required placeholder="Ex: (41) 99999-9999">
                     </div>
                     <div class="form-group">
-                        <label>Mensagem / Proposta de Valor (Opcional):</label>
-                        <textarea id="propMsg" rows="3" placeholder="Ex: Aceita fechar X valor nos dois itens? Retiro em mãos em Curitiba."></textarea>
+                        <label>Mensagem / Proposta de Valor:</label>
+                        <textarea id="propMsg" rows="3" placeholder="Ex: Olá Berne, aceita fechar esse lote por X valor? Retiro em mãos."></textarea>
                     </div>
-                    <button type="submit" class="retro-btn send-proposal-btn">> Enviar Proposta para o Berne</button>
+                    <button type="submit" class="retro-btn send-proposal-btn">> Enviar Proposta via WhatsApp</button>
                 </form>
             </div>
 
             <footer>
-                <p>Loja do Berne - Sistema de Vitrine Virtual v1.0 | Curitiba/PR</p>
+                <p>Loja do Berne - Sistema de Vitrine Virtual v1.1 | Curitiba/PR</p>
             </footer>
         </div>
     </div>
 
     <script>
-        // Array para gerenciar os itens selecionados
+        // Simulando a base de dados (que no futuro pode vir de uma Planilha Google via JSON/CSV)
+        const produtos = [
+            { id: 1, categoria: 'Action Figures', nome: 'Action Figure Raro', preco: 180.00, desc: 'Perfeito estado, caixa original lacrada. Franquia clássica.', img: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=400' },
+            { id: 2, categoria: 'Retro Games', nome: 'Cartucho Classico 16-bit', preco: 120.00, desc: 'Item testado e funcionando perfeitamente. Relíquia pura!', img: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400' },
+            { id: 3, categoria: 'Quadrinhos', nome: 'HQ Colecionador Anos 80', preco: 90.00, desc: 'Edição histórica em ótimo estado de conservação.', img: 'https://images.unsplash.com/photo-1612287233002-91d0bc536af1?w=400' },
+            { id: 4, categoria: 'Action Figures', nome: 'Boneco Colecionável Anos 90', preco: 150.00, desc: 'Item clássico de prateleira, excelente conservação.', img: 'https://images.unsplash.com/photo-1563089145-599997674d42?w=400' }
+        ];
+
         let carrinho = [];
+
+        // Inicialização do Contador de Visitantes Estilo Retro
+        window.onload = function() {
+            let visitas = localStorage.getItem('berne_visitas');
+            if (!visitas) {
+                visitas = 1042; // Número inicial bacana
+            } else {
+                visitas = parseInt(visitas) + 1;
+            }
+            localStorage.setItem('berne_visitas', visitas);
+            document.getElementById('counterVal').innerText = String(visitas).padStart(6, '0');
+            
+            exibirProdutos(produtos);
+        };
+
+        function exibirProdutos(lista) {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+            
+            lista.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <img src="${p.img}" alt="${p.nome}">
+                    <div><span class="product-category-tag">${p.categoria}</span></div>
+                    <div class="product-title">${p.nome}</div>
+                    <div class="product-desc">${p.desc}</div>
+                    <div class="product-price">R$ ${p.preco.toFixed(2)}</div>
+                    <button class="retro-btn add-cart" onclick="adicionarItem('${p.nome}', ${p.preco})">Selecionar Item</button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filtrarCategoria(cat) {
+            // Atualiza botões ativos
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (cat === 'todos') {
+                exibirProdutos(produtos);
+            } else {
+                const filtrados = produtos.filter(p => p.categoria === cat);
+                exibirProdutos(filtrados);
+            }
+        }
 
         function adicionarItem(nome, preco) {
             carrinho.push({ nome, preco });
@@ -391,23 +453,20 @@
             let total = carrinho.reduce((sum, item) => sum + item.preco, 0);
             let listaItens = carrinho.map(i => `- ${i.nome} (R$ ${i.preco.toFixed(2)})`).join('\n');
 
-            // Monta o texto formatado para envio (ex: via WhatsApp ou E-mail)
+            // Monta o texto incluindo detalhadamente os valores de cada item e o total somado
             let textoWhats = `*PROPOSTA - LOJA DO BERNE*%0A` +
                              `----------------------------------%0A` +
                              `*Nome:* ${encodeURIComponent(nome)}%0A` +
-                             `*Contato:* ${encodeURIComponent(contato)}%0A%0A` +
-                             `*Itens de Interesse:*%0A${encodeURIComponent(listaItens)}%0A%0A` +
-                             `*Total da Tabela:* R$ ${total.toFixed(2)}%0A` +
-                             `*Obs/Proposta:* ${encodeURIComponent(mensagem)}`;
+                             `*Contato/Autenticação:* ${encodeURIComponent(contato)}%0A%0A` +
+                             `*Itens Selecionados & Valores:*%0A${encodeURIComponent(listaItens)}%0A%0A` +
+                             `*VALOR TOTAL DA TABELA:* R$ ${total.toFixed(2)}%0A` +
+                             `*Mensagem/Proposta:* ${encodeURIComponent(mensagem)}`;
 
-            // Exemplo de direcionamento seguro (Abre o WhatsApp com a mensagem pronta ou simula envio de email)
-            // Para testar, você pode substituir pelo seu número de WhatsApp com DDD (Ex: 5541999999999)
-            const seuNumeroWhatsApp = "5541999999999"; 
+            // Substitua abaixo pelo seu número de WhatsApp com DDI e DDD (Ex: 55 + 41 + seu número)
+            const seuNumeroWhatsApp = "5541999378922"; 
             const urlWhatsApp = `https://api.whatsapp.com/send?phone=${seuNumeroWhatsApp}&text=${textoWhats}`;
 
-            alert(`Proposta validada com sucesso, ${nome}!\nVocê será redirecionado para concluir o envio da proposta.`);
-            
-            // Abre o link do WhatsApp para garantir a autenticidade e contato direto
+            alert(`Proposta validada, ${nome}!\nVocê será redirecionado para enviar os dados para o Berne.`);
             window.open(urlWhatsApp, '_blank');
         }
     </script>
