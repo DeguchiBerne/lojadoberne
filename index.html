@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja do Berne.exe - Relíquias & Geek</title>
+    <!-- Fonte pixelada dos anos 2000 / Arcade -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0b0b14;
+            --panel-bg: #15152b;
+            --border-light: #4a4a8a;
+            --border-dark: #05050c;
+            --neon-pink: #ff007f;
+            --neon-green: #00ff66;
+            --neon-yellow: #ffff00;
+            --text-main: #00ff66;
+            --text-dim: #a0a0c0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Share Tech Mono', monospace;
+            background-image: 
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 6px 100%;
+            padding: 10px;
+        }
+
+        /* Janela Estilo Win98/XP Retro */
+        .window {
+            background: var(--panel-bg);
+            border: 3px solid;
+            border-color: #fff var(--border-dark) var(--border-dark) #fff;
+            max-width: 1000px;
+            margin: 20px auto;
+            box-shadow: 8px 8px 0px rgba(0,0,0,0.8);
+        }
+
+        .title-bar {
+            background: linear-gradient(90deg, #000080, #1084d0);
+            color: white;
+            padding: 6px 10px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title-bar-controls button {
+            background: #c0c0c0;
+            border: 1px solid;
+            border-color: #fff #000 #000 #fff;
+            width: 16px;
+            height: 16px;
+            font-size: 9px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        /* Topo / Header */
+        header {
+            text-align: center;
+            border-bottom: 2px dashed var(--neon-pink);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 18px;
+            color: var(--neon-pink);
+            text-shadow: 2px 2px var(--neon-green);
+            margin-bottom: 10px;
+        }
+
+        /* Letreiro Marquee */
+        .marquee-box {
+            background: #000;
+            border: 1px inset var(--border-light);
+            color: var(--neon-yellow);
+            padding: 5px;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        /* Grid de Produtos */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: #0d0d1a;
+            border: 2px solid var(--border-light);
+            padding: 15px;
+            text-align: center;
+            position: relative;
+            box-shadow: inset 2px 2px 0px rgba(255,255,255,0.05);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border: 1px solid var(--border-light);
+            margin-bottom: 10px;
+            filter: grayscale(20%) contrast(120%);
+        }
+
+        .product-title {
+            font-size: 20px;
+            color: var(--neon-green);
+            margin-bottom: 5px;
+        }
+
+        .product-desc {
+            font-size: 15px;
+            color: var(--text-dim);
+            margin-bottom: 10px;
+            min-height: 40px;
+        }
+
+        .product-price {
+            font-size: 18px;
+            color: var(--neon-yellow);
+            margin-bottom: 10px;
+        }
+
+        /* Botões Estilo Retro */
+        .retro-btn {
+            background: #2b2b50;
+            color: #fff;
+            border: 2px solid;
+            border-color: #fff #444 #444 #fff;
+            padding: 8px 12px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .retro-btn:active {
+            border-color: #444 #fff #fff #444;
+            background: #1f1f3a;
+        }
+
+        .retro-btn.add-cart {
+            background: #008080;
+        }
+
+        /* Seção do Carrinho / Proposta */
+        .proposal-section {
+            margin-top: 30px;
+            border-top: 2px dashed var(--border-light);
+            padding-top: 20px;
+        }
+
+        .proposal-section h2 {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 12px;
+            color: var(--neon-yellow);
+            margin-bottom: 15px;
+        }
+
+        .cart-list {
+            background: #000;
+            border: 2px inset var(--border-light);
+            padding: 10px;
+            min-height: 80px;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            border-bottom: 1px dotted #333;
+            padding-bottom: 3px;
+        }
+
+        .total-display {
+            font-size: 20px;
+            color: var(--neon-pink);
+            margin-bottom: 15px;
+            text-align: right;
+        }
+
+        /* Formulário de Proposta */
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 16px;
+            margin-bottom: 3px;
+            color: var(--text-dim);
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            background: #000;
+            border: 1px solid var(--border-light);
+            color: var(--neon-green);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 16px;
+        }
+
+        .send-proposal-btn {
+            background: #00aa00;
+            color: white;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--text-dim);
+            border-top: 1px solid #222;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="window">
+        <!-- Barra de Título Estilo Win98 -->
+        <div class="title-bar">
+            <span>C:\LOJA_DO_BERNE\VITRINE.EXE</span>
+            <div class="title-bar-controls">
+                <button>_</button>
+                <button>□</button>
+                <button>X</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <header>
+                <h1>Loja do Berne</h1>
+                <p>> O refúgio definitivo de relíquias Geek, Anos 80, 90 & Colecionáveis <</p>
+            </header>
+
+            <div class="marquee-box">
+                <marquee scrollamount="4">*** BEM-VINDO À VITRINE DO BERNE! SELECIONE OS ITENS DESEJADOS E MONTE SUA PROPOSTA DE NEGOCIAÇÃO ABAIXO! ***</marquee>
+            </div>
+
+            <!-- Vitrine de Produtos -->
+            <div class="product-grid">
+                <!-- Item 1 -->
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=400" alt="Action Figure">
+                    <div class="product-title">Action Figure Raro</div>
+                    <div class="product-desc">Perfeito estado, caixa original lacrada. Franquia clássica dos anos 90.</div>
+                    <div class="product-price">R$ 180,00</div>
+                    <button class="retro-btn add-cart" onclick="adicionarItem('Action Figure Raro', 180.00)">Selecionar Item</button>
+                </div>
+
+                <!-- Item 2 -->
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400" alt="Cartucho Retro">
+                    <div class="product-title">Cartucho Classico 16-bit</div>
+                    <div class="product-desc">Item testado e funcionando perfeitamente. Relíquia pura!</div>
+                    <div class="product-price">R$ 120,00</div>
+                    <button class="retro-btn add-cart" onclick="adicionarItem('Cartucho Classico 16-bit', 120.00)">Selecionar Item</button>
+                </div>
+
+                <!-- Item 3 -->
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1612287233002-91d0bc536af1?w=400" alt="Quadrinho Raro">
+                    <div class="product-title">HQ Colecionador Anos 80</div>
+                    <div class="product-desc">Edição histórica em ótimo estado de conservação para colecionadores exigentes.</div>
+                    <div class="product-price">R$ 90,00</div>
+                    <button class="retro-btn add-cart" onclick="adicionarItem('HQ Colecionador Anos 80', 90.00)">Selecionar Item</button>
+                </div>
+            </div>
+
+            <!-- Seção de Proposta e Carrinho -->
+            <div class="proposal-section">
+                <h2>// SEUS ITENS SELECIONADOS & PROPOSTA</h2>
+                
+                <div class="cart-list" id="cartList">
+                    <span style="color: var(--text-dim);">Nenhum item selecionado na vitrine ainda...</span>
+                </div>
+
+                <div class="total-display">
+                    Custo Total Estimado: <span id="cartTotal">R$ 0,00</span>
+                </div>
+
+                <!-- Formulário para envio de proposta -->
+                <form id="proposalForm" onsubmit="enviarProposta(event)">
+                    <div class="form-group">
+                        <label>Seu Nome / Apelido:</label>
+                        <input type="text" id="propName" required placeholder="Ex: Colecionador99">
+                    </div>
+                    <div class="form-group">
+                        <label>Seu E-mail ou WhatsApp (para autenticação/contato):</label>
+                        <input type="text" id="propContact" required placeholder="Ex: (41) 99999-9999 ou email@exemplo.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Mensagem / Proposta de Valor (Opcional):</label>
+                        <textarea id="propMsg" rows="3" placeholder="Ex: Aceita fechar X valor nos dois itens? Retiro em mãos em Curitiba."></textarea>
+                    </div>
+                    <button type="submit" class="retro-btn send-proposal-btn">> Enviar Proposta para o Berne</button>
+                </form>
+            </div>
+
+            <footer>
+                <p>Loja do Berne - Sistema de Vitrine Virtual v1.0 | Curitiba/PR</p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // Array para gerenciar os itens selecionados
+        let carrinho = [];
+
+        function adicionarItem(nome, preco) {
+            carrinho.push({ nome, preco });
+            atualizarCarrinho();
+        }
+
+        function removerItem(index) {
+            carrinho.splice(index, 1);
+            atualizarCarrinho();
+        }
+
+        function atualizarCarrinho() {
+            const cartList = document.getElementById('cartList');
+            const cartTotal = document.getElementById('cartTotal');
+            
+            cartList.innerHTML = '';
+
+            if (carrinho.length === 0) {
+                cartList.innerHTML = '<span style="color: var(--text-dim);">Nenhum item selecionado na vitrine ainda...</span>';
+                cartTotal.innerText = 'R$ 0,00';
+                return;
+            }
+
+            let total = 0;
+            carrinho.forEach((item, index) => {
+                total += item.preco;
+                const div = document.createElement('div');
+                div.className = 'cart-item';
+                div.innerHTML = `
+                    <span>> ${item.nome}</span>
+                    <span>R$ ${item.preco.toFixed(2)} <button onclick="removerItem(${index})" style="background:red; color:white; border:none; padding:2px 5px; cursor:pointer; margin-left:10px;">[X]</button></span>
+                `;
+                cartList.appendChild(div);
+            });
+
+            cartTotal.innerText = `R$ ${total.toFixed(2)}`;
+        }
+
+        function enviarProposta(event) {
+            event.preventDefault();
+            
+            if (carrinho.length === 0) {
+                alert("ERRO: Selecione ao menos um item da vitrine antes de enviar uma proposta!");
+                return;
+            }
+
+            const nome = document.getElementById('propName').value;
+            const contato = document.getElementById('propContact').value;
+            const mensagem = document.getElementById('propMsg').value;
+            
+            let total = carrinho.reduce((sum, item) => sum + item.preco, 0);
+            let listaItens = carrinho.map(i => `- ${i.nome} (R$ ${i.preco.toFixed(2)})`).join('\n');
+
+            // Monta o texto formatado para envio (ex: via WhatsApp ou E-mail)
+            let textoWhats = `*PROPOSTA - LOJA DO BERNE*%0A` +
+                             `----------------------------------%0A` +
+                             `*Nome:* ${encodeURIComponent(nome)}%0A` +
+                             `*Contato:* ${encodeURIComponent(contato)}%0A%0A` +
+                             `*Itens de Interesse:*%0A${encodeURIComponent(listaItens)}%0A%0A` +
+                             `*Total da Tabela:* R$ ${total.toFixed(2)}%0A` +
+                             `*Obs/Proposta:* ${encodeURIComponent(mensagem)}`;
+
+            // Exemplo de direcionamento seguro (Abre o WhatsApp com a mensagem pronta ou simula envio de email)
+            // Para testar, você pode substituir pelo seu número de WhatsApp com DDD (Ex: 5541999999999)
+            const seuNumeroWhatsApp = "5541999999999"; 
+            const urlWhatsApp = `https://api.whatsapp.com/send?phone=${seuNumeroWhatsApp}&text=${textoWhats}`;
+
+            alert(`Proposta validada com sucesso, ${nome}!\nVocê será redirecionado para concluir o envio da proposta.`);
+            
+            // Abre o link do WhatsApp para garantir a autenticidade e contato direto
+            window.open(urlWhatsApp, '_blank');
+        }
+    </script>
+</body>
+</html>
