@@ -70,7 +70,6 @@
             border-bottom: 2px dashed var(--neon-pink);
             padding-bottom: 15px;
             margin-bottom: 20px;
-            position: relative;
         }
 
         header h1 {
@@ -81,7 +80,6 @@
             margin-bottom: 10px;
         }
 
-        /* Contador Retrô no Topo */
         .visitor-counter {
             background: #000;
             border: 2px inset var(--border-light);
@@ -109,7 +107,6 @@
             margin-bottom: 20px;
         }
 
-        /* Categorias e Filtros */
         .category-filter {
             display: flex;
             justify-content: center;
@@ -293,7 +290,7 @@
             </header>
 
             <div class="marquee-box">
-                <marquee scrollamount="4">*** SELECIONE SEUS ITENS POR CATEGORIA E MONTE SUA PROPOSTA DE NEGOCIAÇÃO ABAIXO! ***</marquee>
+                <marquee scrollamount="4">*** SELECIONE SEUS ITENS NA VITRINE E ENVIE SUA PROPOSTA DIRETAMENTE VIA WHATSAPP! ***</marquee>
             </div>
 
             <!-- Filtros de Categoria -->
@@ -304,12 +301,10 @@
                 <button class="filter-btn" onclick="filtrarCategoria('Quadrinhos')">[ Quadrinhos & HQs ]</button>
             </div>
 
-            <!-- Vitrine de Produtos (Categorizada) -->
-            <div class="product-grid" id="productGrid">
-                <!-- Os produtos são injetados via JavaScript para simular a leitura de dados -->
-            </div>
+            <!-- Vitrine de Produtos -->
+            <div class="product-grid" id="productGrid"></div>
 
-            <!-- Seção de Proposta e Carrinho -->
+            <!-- Seção de Proposta -->
             <div class="proposal-section">
                 <h2>// SEUS ITENS SELECIONADOS & PROPOSTA</h2>
                 
@@ -327,11 +322,11 @@
                         <input type="text" id="propName" required placeholder="Ex: ColecionadorCuritiba">
                     </div>
                     <div class="form-group">
-                        <label>Seu WhatsApp ou E-mail (para autenticação):</label>
+                        <label>Seu WhatsApp (para identificação e contato):</label>
                         <input type="text" id="propContact" required placeholder="Ex: (41) 99999-9999">
                     </div>
                     <div class="form-group">
-                        <label>Mensagem / Proposta de Valor:</label>
+                        <label>Mensagem / Proposta de Valor (Opcional):</label>
                         <textarea id="propMsg" rows="3" placeholder="Ex: Olá Berne, aceita fechar esse lote por X valor? Retiro em mãos."></textarea>
                     </div>
                     <button type="submit" class="retro-btn send-proposal-btn">> Enviar Proposta via WhatsApp</button>
@@ -339,13 +334,12 @@
             </div>
 
             <footer>
-                <p>Loja do Berne - Sistema de Vitrine Virtual v1.1 | Curitiba/PR</p>
+                <p>Loja do Berne - Sistema de Vitrine Virtual v1.2 | Curitiba/PR</p>
             </footer>
         </div>
     </div>
 
     <script>
-        // Simulando a base de dados (que no futuro pode vir de uma Planilha Google via JSON/CSV)
         const produtos = [
             { id: 1, categoria: 'Action Figures', nome: 'Action Figure Raro', preco: 180.00, desc: 'Perfeito estado, caixa original lacrada. Franquia clássica.', img: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=400' },
             { id: 2, categoria: 'Retro Games', nome: 'Cartucho Classico 16-bit', preco: 120.00, desc: 'Item testado e funcionando perfeitamente. Relíquia pura!', img: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400' },
@@ -355,11 +349,10 @@
 
         let carrinho = [];
 
-        // Inicialização do Contador de Visitantes Estilo Retro
         window.onload = function() {
             let visitas = localStorage.getItem('berne_visitas');
             if (!visitas) {
-                visitas = 1042; // Número inicial bacana
+                visitas = 1042;
             } else {
                 visitas = parseInt(visitas) + 1;
             }
@@ -389,7 +382,6 @@
         }
 
         function filtrarCategoria(cat) {
-            // Atualiza botões ativos
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
 
@@ -451,22 +443,23 @@
             const mensagem = document.getElementById('propMsg').value;
             
             let total = carrinho.reduce((sum, item) => sum + item.preco, 0);
-            let listaItens = carrinho.map(i => `- ${i.nome} (R$ ${i.preco.toFixed(2)})`).join('\n');
+            
+            // Monta a lista detalhada com o nome de cada item e seu respectivo valor
+            let listaItensFormatada = carrinho.map(i => `• ${i.nome} - R$ ${i.preco.toFixed(2)}`).join('\n');
 
-            // Monta o texto incluindo detalhadamente os valores de cada item e o total somado
             let textoWhats = `*PROPOSTA - LOJA DO BERNE*%0A` +
                              `----------------------------------%0A` +
                              `*Nome:* ${encodeURIComponent(nome)}%0A` +
-                             `*Contato/Autenticação:* ${encodeURIComponent(contato)}%0A%0A` +
-                             `*Itens Selecionados & Valores:*%0A${encodeURIComponent(listaItens)}%0A%0A` +
-                             `*VALOR TOTAL DA TABELA:* R$ ${total.toFixed(2)}%0A` +
-                             `*Mensagem/Proposta:* ${encodeURIComponent(mensagem)}`;
+                             `*WhatsApp do Cliente:* ${encodeURIComponent(contato)}%0A%0A` +
+                             `*Itens e Valores Selecionados:*%0A${encodeURIComponent(listaItensFormatada)}%0A%0A` +
+                             `*VALOR TOTAL:* R$ ${total.toFixed(2)}%0A` +
+                             `*Observação/Proposta:* ${encodeURIComponent(mensagem)}`;
 
-            // Substitua abaixo pelo seu número de WhatsApp com DDI e DDD (Ex: 55 + 41 + seu número)
+            // ATENÇÃO: Substitua os números abaixo pelo seu WhatsApp real com DDI (55) e DDD (ex: 41)
             const seuNumeroWhatsApp = "5541999378922"; 
             const urlWhatsApp = `https://api.whatsapp.com/send?phone=${seuNumeroWhatsApp}&text=${textoWhats}`;
 
-            alert(`Proposta validada, ${nome}!\nVocê será redirecionado para enviar os dados para o Berne.`);
+            alert(`Proposta validada, ${nome}!\nVocê será redirecionado para enviar a mensagem via WhatsApp para o Berne.`);
             window.open(urlWhatsApp, '_blank');
         }
     </script>
