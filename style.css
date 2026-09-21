@@ -1,0 +1,185 @@
+@charset "UTF-8";
+
+/* =========================================
+   TEMA 1: CLÁSSICO WIN 98 (PADRÃO)
+   ========================================= */
+body.theme-win98 {
+    --bg-main: #008080;
+    --bg-pattern: radial-gradient(#006666 15%, transparent 16%), radial-gradient(#006666 15%, transparent 16%);
+    --panel-bg: #c0c0c0;
+    --text-color: #000000;
+    --font-main: Tahoma, Geneva, sans-serif;
+    --border-outer: 3px solid;
+    --border-colors-outer: #dfdfdf #080808 #080808 #dfdfdf;
+    --card-bg: #f1f1f1;
+    --cat-bg: #e0e0e0;
+    --cat-border: 2px inset #fff;
+    --btn-bg: #c0c0c0;
+    --btn-border: 2px solid;
+    --btn-border-c: #dfdfdf #080808 #080808 #dfdfdf;
+}
+
+/* =========================================
+   TEMA 2: ARCADE 90s NEON
+   ========================================= */
+body.theme-neon {
+    --bg-main: #0b0b16;
+    --bg-pattern: none;
+    --panel-bg: #15152b;
+    --text-color: #00ffcc;
+    --font-main: "Courier New", Courier, monospace;
+    --border-outer: 4px solid #00ffff;
+    --border-colors-outer: #00ffff;
+    --card-bg: #1e1e3f;
+    --cat-bg: rgba(0,0,0,0.5);
+    --cat-border: 1px solid #00ffcc;
+    --btn-bg: #ff007f;
+    --btn-border: 2px solid #00ffcc;
+    --btn-border-c: #00ffcc;
+}
+
+body {
+    background-color: var(--bg-main);
+    background-image: var(--bg-pattern);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+    color: var(--text-color);
+    font-family: var(--font-main);
+    margin: 0;
+    padding: 15px;
+    transition: background 0.3s ease;
+}
+
+/* Estrutura Principal */
+.window-frame {
+    max-width: 1100px;
+    margin: 20px auto;
+    background-color: var(--panel-bg);
+    border: var(--border-outer);
+    border-color: var(--border-colors-outer);
+    box-shadow: 4px 4px 15px rgba(0,0,0,0.6);
+    padding: 4px;
+}
+.theme-neon .window-frame { box-shadow: 0 0 20px #00ffff; padding: 20px; }
+
+.titlebar { display: flex; justify-content: space-between; align-items: center; }
+.theme-win98 .titlebar { background: linear-gradient(90deg, #000080, #1084d0); color: white; padding: 4px 8px; font-weight: bold; font-size: 14px; margin-bottom: 4px;}
+.theme-neon .titlebar { display: none; }
+
+.content-area { padding: 20px; min-height: 500px; }
+.theme-win98 .content-area { background-color: #ffffff; border: 2px solid; border-color: #080808 #dfdfdf #dfdfdf #080808; }
+.theme-neon .content-area { padding: 0; border: none; background: transparent; }
+
+/* Marquee */
+.marquee-box { padding: 4px; margin-bottom: 15px; font-weight: bold; font-size: 12px; }
+.theme-win98 .marquee-box { background-color: #ffffcc; border: 1px solid #999; color: #990000; }
+.theme-neon .marquee-box { background-color: #1e1e3f; border: 1px solid #00ffcc; color: #ffee00; }
+
+/* Cabeçalho, Títulos e Controles */
+header { text-align: center; border-bottom: 2px dashed; padding-bottom: 15px; margin-bottom: 20px; }
+.theme-win98 header { border-color: #808080; }
+.theme-neon header { border-color: #00ffcc; }
+
+h1 { margin: 0 0 15px 0; font-size: 32px; letter-spacing: 2px; }
+.theme-win98 h1 { font-family: "Impact", sans-serif; color: #000080; text-shadow: 2px 2px #c0c0c0; }
+.theme-neon h1 { font-family: "Courier New", monospace; color: #00ffcc; text-shadow: 2px 2px #ff007f; }
+
+.controls { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+.btn-retro { display: inline-block; background: var(--btn-bg); color: var(--theme-neon ? #fff : #000); border: var(--btn-border); border-color: var(--btn-border-c); padding: 6px 12px; font-weight: bold; font-size: 12px; text-decoration: none; cursor: pointer; }
+.theme-win98 .btn-retro { color: #000; }
+.theme-neon .btn-retro { color: #fff; box-shadow: 2px 2px 0px #00ffcc; }
+
+.counter { padding: 6px 12px; font-size: 12px; font-weight: bold; }
+.theme-win98 .counter { background: #000; color: #00ff00; border: 2px inset #fff; font-family: "Courier New", monospace; }
+.theme-neon .counter { background: #000; color: #ffee00; border: 1px solid #00ffcc; }
+
+/* Painel Guia Categorias */
+.cat-guide { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; margin-bottom: 25px; background: var(--cat-bg); border: var(--cat-border); }
+.cat-tab { padding: 5px 10px; font-size: 11px; font-weight: bold; cursor: pointer; }
+.theme-win98 .cat-tab { background: #c0c0c0; color: #000; border: 2px solid; border-color: #dfdfdf #080808 #080808 #dfdfdf; }
+.theme-win98 .cat-tab.active { background: #fff; border-color: #080808 #dfdfdf #dfdfdf #080808; }
+.theme-neon .cat-tab { background: #222; color: #ffee00; border: 1px solid #00ffcc; }
+.theme-neon .cat-tab.active { background: #00ffcc; color: #000; }
+
+.section-title { font-size: 18px; font-weight: bold; text-transform: uppercase; margin: 20px 0 10px 0; padding-bottom: 5px; }
+.theme-win98 .section-title { color: #000080; border-bottom: 2px solid #c0c0c0; }
+.theme-neon .section-title { color: #ffee00; border-bottom: 1px solid #00ffcc; }
+
+/* Grid e Cards */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+.card { background: var(--card-bg); padding: 10px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+.theme-win98 .card { border: 2px solid; border-color: #dfdfdf #808080 #808080 #dfdfdf; }
+.theme-neon .card { border: 2px solid #00ffff; box-shadow: 3px 3px 0px rgba(0,0,0,0.5); }
+
+.img-box { width: 100%; height: 180px; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; }
+.theme-win98 .img-box { border: 2px inset #fff; }
+.theme-neon .img-box { border: 1px solid #00ffcc; }
+.img-box img { width: 100%; height: 100%; object-fit: cover; }
+
+.sold-badge { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; font-family: "Impact", sans-serif; letter-spacing: 3px; transform: rotate(-15deg); z-index: 5; text-shadow: 2px 2px #000; pointer-events: none; }
+.theme-win98 .sold-badge { background-color: rgba(255,0,0,0.7); color: yellow; }
+.theme-neon .sold-badge { background-color: rgba(255,0,127,0.8); color: #ffee00; }
+
+.card-content { padding: 8px 0; display: flex; flex-direction: column; flex-grow: 1; }
+.cat-tag { font-size: 10px; font-weight: bold; text-transform: uppercase; padding: 2px 4px; display: inline-block; margin-bottom: 5px; }
+.theme-win98 .cat-tag { color: #000080; background: #ffffcc; border: 1px dotted #999; }
+.theme-neon .cat-tag { color: #ffee00; background: #000; border: 1px solid #00ffcc; }
+
+.item-title { font-size: 14px; font-weight: bold; margin: 5px 0; }
+.theme-win98 .item-title { color: #000; }
+.theme-neon .item-title { color: #00ffcc; }
+
+.item-desc { font-size: 11px; flex-grow: 1; margin-bottom: 10px; }
+.theme-win98 .item-desc { color: #333; }
+.theme-neon .item-desc { color: #ccc; }
+
+.card-footer { display: flex; flex-direction: column; gap: 8px; padding-top: 8px; }
+.theme-win98 .card-footer { border-top: 1px solid #c0c0c0; }
+.theme-neon .card-footer { border-top: 1px dotted #00ffcc; }
+
+.price-row { display: flex; justify-content: space-between; align-items: center; }
+.price { font-size: 15px; font-weight: bold; padding: 2px 6px; }
+.theme-win98 .price { color: #006600; background: #eefefe; border: 1px solid #ccc; }
+.theme-neon .price { color: #00ff66; background: #000; border: 1px solid #00ffcc; }
+
+.cart-btn { padding: 5px; font-weight: bold; font-size: 11px; cursor: pointer; text-align: center; }
+.theme-win98 .cart-btn { background: #c0c0c0; color: #000; border: 2px solid; border-color: #fff #080808 #080808 #fff; font-family: Tahoma; }
+.theme-win98 .cart-btn.added { background: #008000; color: #fff; }
+.theme-neon .cart-btn { background: #ffee00; color: #000; border: 2px solid #00ffcc; }
+.theme-neon .cart-btn.added { background: #00ff66; color: #000; }
+.cart-btn.disabled { background: #555 !important; color: #999 !important; border-color: #333 !important; cursor: not-allowed; }
+
+/* =========================================
+   CARRINHO FLUTUANTE
+   ========================================= */
+.floating-cart { position: fixed; bottom: 0; right: 20px; width: 320px; z-index: 1000; transition: transform 0.3s ease-in-out; }
+.floating-cart.minimized { transform: translateY(calc(100% - 35px)); }
+
+.theme-win98 .floating-cart { background: #c0c0c0; border: 2px solid; border-color: #dfdfdf #080808 #080808 #dfdfdf; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+.theme-neon .floating-cart { background: #15152b; border: 3px solid #00ffff; box-shadow: 0 0 15px #00ffff; }
+
+.fc-header { padding: 8px 12px; font-weight: bold; font-size: 12px; display: flex; justify-content: space-between; cursor: pointer; }
+.theme-win98 .fc-header { background: #000080; color: #fff; }
+.theme-neon .fc-header { background: #ff007f; color: #fff; border-bottom: 2px solid #00ffff; }
+
+.fc-body { padding: 10px; max-height: 200px; overflow-y: auto; font-size: 11px; }
+.theme-win98 .fc-body { background: #fff; color: #000; border: 2px inset #dfdfdf; margin: 5px; }
+.theme-neon .fc-body { background: #fff; color: #000; }
+
+.fc-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding: 4px 0; }
+
+.fc-footer { padding: 10px; text-align: center; }
+.theme-win98 .fc-footer { border-top: 2px solid #dfdfdf; color: #000;}
+.theme-neon .fc-footer { border-top: 2px solid #00ffff; color: #00ffcc; }
+
+.wpp-btn { display: block; width: 100%; padding: 8px; font-weight: bold; font-size: 12px; cursor: pointer; text-decoration: none; margin-top: 8px; box-sizing: border-box; }
+.theme-win98 .wpp-btn { background: #25d366; color: white; border: 2px solid; border-color: #fff #075e54 #075e54 #fff; }
+.theme-neon .wpp-btn { background: #25d366; color: #fff; border: 2px solid #fff; }
+.wpp-btn.disabled { opacity: 0.5; pointer-events: none; }
+
+/* Modais Admin (se usar na mesma página ou no admin.html) */
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 2000; }
+.modal-content { background: var(--panel-bg); padding: 25px; border: var(--border-outer); border-color: var(--border-colors-outer); width: 320px; text-align: center; color: var(--text-color); }
+.modal-content input { width: 90%; padding: 8px; margin: 15px 0; font-family: var(--font-main); }
+.modal-buttons { display: flex; justify-content: space-between; gap: 10px; }
+.modal-buttons button { flex: 1; padding: 8px; font-family: var(--font-main); cursor: pointer; }
