@@ -36,16 +36,17 @@
                 <span id="admin-count-info" style="margin-left: auto; font-size: 11px; font-weight: bold;">Carregando...</span>
             </div>
 
-            <!-- Tabela com Cabeçalhos Redimensionáveis -->
+            <!-- Tabela com Miniatura antes do Status e Colunas com Redimensionamento -->
             <div class="admin-table-container">
                 <table class="win98-table" id="inventory-table">
                     <thead>
                         <tr>
                             <th style="width: 50px;">Linha</th>
-                            <th style="width: 100px;">Status</th>
+                            <th style="width: 60px;">Foto</th>
+                            <th style="width: 105px;">Status</th>
                             <th style="width: 140px;">Categoria</th>
                             <th style="width: 200px;">Nome do Item</th>
-                            <th style="width: 260px;">Descrição</th>
+                            <th style="width: 250px;">Descrição</th>
                             <th style="width: 80px;">Preço</th>
                             <th style="width: 200px;">Links das Fotos</th>
                             <th style="width: 140px;">Arquivo</th>
@@ -53,7 +54,7 @@
                     </thead>
                     <tbody id="table-body">
                         <tr>
-                            <td colspan="8" style="text-align: center; padding: 20px;">Carregando dados...</td>
+                            <td colspan="9" style="text-align: center; padding: 20px;">Carregando dados da planilha...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -79,38 +80,45 @@
         const PAGE_SIZE = 20;
 
         window.onload = function() {
-            enableColumnResizing();
             fetch(API_URL + "?action=getData")
                 .then(r => r.json())
                 .then(items => {
                     rawItems = items;
                     populateCategoryDropdown(items);
                     onFilterChange();
+                    initResizableColumns();
                 })
                 .catch(() => {
-                    document.getElementById('table-body').innerHTML = '<tr><td colspan="8" style="color:red; text-align:center;">Erro ao carregar dados da planilha.</td></tr>';
+                    document.getElementById('table-body').innerHTML = '<tr><td colspan="9" style="color:red; text-align:center;">Erro ao carregar dados da planilha.</td></tr>';
                 });
         };
 
-        // Redimensionamento Horizontal das Colunas da Tabela
-        function enableColumnResizing() {
-            const ths = document.querySelectorAll('#inventory-table th');
-            ths.forEach(th => {
+        // Redimensionamento horizontal persistente das colunas
+        function initResizableColumns() {
+            const table = document.getElementById('inventory-table');
+            const cols = table.querySelectorAll('th');
+
+            cols.forEach(col => {
+                // Evita duplicar se já existir
+                if (col.querySelector('.resizer')) return;
+
                 const resizer = document.createElement('div');
                 resizer.classList.add('resizer');
-                th.appendChild(resizer);
+                col.appendChild(resizer);
 
                 let startX, startWidth;
 
-                resizer.addEventListener('mousedown', (e) => {
+                resizer.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     startX = e.pageX;
-                    startWidth = th.offsetWidth;
+                    startWidth = col.offsetWidth;
                     resizer.classList.add('resizing');
 
-                    function onMouseMove(e) {
-                        const newWidth = startWidth + (e.pageX - startX);
-                        if (newWidth > 35) {
-                            th.style.width = newWidth + 'px';
+                    function onMouseMove(moveEvent) {
+                        const newWidth = startWidth + (moveEvent.pageX - startX);
+                        if (newWidth > 40) {
+                            col.style.width = newWidth + 'px';
                         }
                     }
 
@@ -189,7 +197,7 @@
             document.getElementById('admin-count-info').innerText = `Total: ${total} item(ns)`;
 
             if (total === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:15px;">Nenhum item correspondente ao filtro.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:15px;">Nenhum item correspondente ao filtro.</td></tr>';
                 document.getElementById('admin-pagination').innerHTML = '';
                 return;
             }
@@ -208,8 +216,18 @@
                 const isVendido = item.status === 'VENDIDO';
                 const statusColor = isVendido ? '#008000' : '#000000';
 
+                // Pega a primeira foto da lista de links convertidos
+                let thumbSrc = (item.links && item.links.length > 0) 
+                    ? item.links[0] 
+                    : 'https://via.placeholder.com/42x42?text=Sem+Foto';
+
                 tr.innerHTML = `
                     <td style="text-align: center; font-weight: bold; background: #e8e8e8;">${item.rowIndex}</td>
+                    <td style="text-align: center;">
+                        <div class="admin-thumb-box">
+                            <img src="${thumbSrc}" alt="Foto" loading="lazy" onerror="this.src='https://via.placeholder.com/42x42?text=Erro'">
+                        </div>
+                    </td>
                     <td>
                         <select class="f-status" onchange="updateStatusColor(this)" style="font-weight:bold; color: ${statusColor};">
                             <option value="" ${!isVendido ? 'selected' : ''}>Disponível</option>
