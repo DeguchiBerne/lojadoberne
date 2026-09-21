@@ -91,7 +91,7 @@
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwv8m5xK7gjdRR6ZWyxqUBrz0fYYLn0pBvTbAjweUuDQl5y7qfk0vZltXQEgTLFUi-unA/exec";
-        const WHATSAPP_NUMBER = "5541999999999"; 
+        const WHATSAPP_NUMBER = "5541999999999";
 
         let allProducts = [];
         let cart = [];
@@ -124,26 +124,10 @@
                 });
         };
 
-        // PARSER DA IMAGEM REVERTIDO (Retoma a forma clássica via lh3.google sem parâmetros q quebram)
-        function resolveDrivePhoto(url) {
-            if (!url) return 'https://via.placeholder.com/240x180?text=Sem+Foto';
-            url = url.trim();
-            if (url.includes('lh3.googleusercontent.com')) return url;
-
-            const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/) || url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-            if (m && m[1]) return "https://lh3.googleusercontent.com/d/" + m[1];
-            
-            return url;
-        }
-
         function getItemPhotosList(item) {
             let list = [];
-            if (item.linkRaw) {
-                let parts = String(item.linkRaw).split(/,|\//);
-                parts.forEach(p => {
-                    let cleaned = p.trim();
-                    if (cleaned.startsWith('http')) list.push(resolveDrivePhoto(cleaned));
-                });
+            if (item.links && Array.isArray(item.links) && item.links.length > 0) {
+                list = item.links;
             }
             if (list.length === 0) list.push('https://via.placeholder.com/240x180?text=Sem+Foto');
             return list;
@@ -372,7 +356,6 @@
             }
 
             if (selectedCategories.size === 0) {
-                // Atualiza visual sem mudar sort aleatório
                 document.querySelectorAll('.card').forEach(c => {
                     const id = c.querySelector('.cart-btn').getAttribute('onclick');
                     if(id && id.includes(rowIndex)) {
