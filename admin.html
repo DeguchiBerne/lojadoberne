@@ -19,7 +19,6 @@
             display: block;
             cursor: pointer;
         }
-        /* Zoom da foto ao passar o mouse no admin */
         .admin-thumb-wrapper:hover .admin-thumb-preview {
             display: block;
         }
@@ -36,9 +35,120 @@
             box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
             z-index: 100;
         }
+
+        /* --- Estilos do Modal de Erro Win98 --- */
+        .win98-msgbox-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 5000;
+            align-items: center;
+            justify-content: center;
+        }
+        .win98-msgbox {
+            background: #c0c0c0;
+            border-top: 1px solid #fff;
+            border-left: 1px solid #fff;
+            border-right: 1px solid #000;
+            border-bottom: 1px solid #000;
+            box-shadow: inset 1px 1px #dfdfdf, inset -1px -1px #808080, 4px 4px 10px rgba(0,0,0,0.5);
+            width: 320px;
+            font-family: Tahoma, sans-serif;
+            color: #000;
+        }
+        .win98-msgbox-title {
+            background: #000080;
+            color: #fff;
+            padding: 3px 5px;
+            font-weight: bold;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .win98-msgbox-close {
+            background: #c0c0c0;
+            border-top: 1px solid #fff;
+            border-left: 1px solid #fff;
+            border-right: 1px solid #000;
+            border-bottom: 1px solid #000;
+            font-size: 10px;
+            font-weight: bold;
+            line-height: 1;
+            padding: 1px 4px;
+            cursor: pointer;
+            color: black;
+        }
+        .win98-msgbox-content {
+            padding: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        .win98-icon-error {
+            width: 32px;
+            height: 32px;
+            background: red;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 24px;
+            border: 2px solid #800000;
+            flex-shrink: 0;
+        }
+        .win98-msgbox-text {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .win98-msgbox-footer {
+            text-align: center;
+            padding-bottom: 15px;
+        }
+        .win98-btn {
+            background: #c0c0c0;
+            border-top: 1px solid #fff;
+            border-left: 1px solid #fff;
+            border-right: 1px solid #000;
+            border-bottom: 1px solid #000;
+            padding: 4px 25px;
+            font-size: 12px;
+            font-family: Tahoma, sans-serif;
+            cursor: pointer;
+            color: black;
+        }
+        .win98-btn:active {
+            border-top: 1px solid #000;
+            border-left: 1px solid #000;
+            border-right: 1px solid #fff;
+            border-bottom: 1px solid #fff;
+        }
     </style>
 </head>
 <body class="theme-win98">
+
+    <!-- Modal ERRO 404 (Aparece ao salvar com sucesso) -->
+    <div class="win98-msgbox-overlay" id="win98-error-modal">
+        <div class="win98-msgbox">
+            <div class="win98-msgbox-title">
+                <span>Erro</span>
+                <button class="win98-msgbox-close" onclick="fecharModalErro()">X</button>
+            </div>
+            <div class="win98-msgbox-content">
+                <div class="win98-icon-error">X</div>
+                <div class="win98-msgbox-text">
+                    <strong>ERRO 404</strong><br><br>
+                    As alterações foram salvas com sucesso na planilha base.
+                </div>
+            </div>
+            <div class="win98-msgbox-footer">
+                <button class="win98-btn" onclick="fecharModalErro()">OK</button>
+            </div>
+        </div>
+    </div>
 
     <div class="window-frame">
         <div class="titlebar">
@@ -48,13 +158,12 @@
         <div class="content-area">
 
             <header style="margin-bottom: 10px; display:flex; justify-content:space-between; align-items:center; flex-direction:row;">
-                <h1 style="font-size: 26px; margin: 0;">PAINEL DE INVENTÁRIO (PLANILHA)</h1>
+                <h1 style="font-size: 26px; margin: 0;">PAINEL DE INVENTÁRIO</h1>
                 <div class="controls">
                     <a href="index.html" class="btn-retro">⬅️ Voltar ao Catálogo</a>
                 </div>
             </header>
 
-            <!-- Barra de Ferramentas -->
             <div class="admin-toolbar">
                 <label><strong>🔍 Buscar:</strong></label>
                 <input type="text" id="admin-search" placeholder="Filtrar por nome, descrição, arquivo..." oninput="onFilterChange()" style="width: 250px;">
@@ -67,7 +176,6 @@
                 <span id="admin-count-info" style="margin-left: auto; font-size: 11px; font-weight: bold;">Carregando...</span>
             </div>
 
-            <!-- Tabela com Miniatura da Capa antes do Status -->
             <div class="admin-table-container">
                 <table class="win98-table" id="inventory-table">
                     <thead>
@@ -93,7 +201,6 @@
 
             <div class="pagination" id="admin-pagination"></div>
 
-            <!-- Botão ÚNICO para Salvar -->
             <div style="text-align: right; margin-top: 15px; border-top: 2px dashed #808080; padding-top: 15px;">
                 <button id="btn-save-bottom" class="btn-retro" style="background:#28a745; color:white; padding: 10px 24px; font-size: 14px;" onclick="salvarTudo()">
                     💾 SALVAR TODAS AS ALTERAÇÕES NA PLANILHA
@@ -124,6 +231,31 @@
                     document.getElementById('table-body').innerHTML = '<tr><td colspan="9" style="color:red; text-align:center;">Erro ao carregar dados da planilha.</td></tr>';
                 });
         };
+
+        // Tratamento da imagem
+        function resolveDrivePhoto(url) {
+            if (!url || typeof url !== 'string') return 'https://via.placeholder.com/44x44?text=Sem+Foto';
+            url = url.trim();
+            if (url.includes('drive.google.com/uc')) return url; 
+
+            const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/) || url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+            if (m && m[1]) return "https://drive.google.com/uc?export=view&id=" + m[1];
+            return url;
+        }
+
+        function getFirstPhotoUrl(item) {
+            if (item.links && Array.isArray(item.links) && item.links.length > 0) {
+                return resolveDrivePhoto(item.links[0]);
+            }
+            if (item.linkRaw) {
+                let parts = String(item.linkRaw).split(/,|\//);
+                for (let i = 0; i < parts.length; i++) {
+                    let cleaned = parts[i].trim();
+                    if (cleaned.startsWith('http')) return resolveDrivePhoto(cleaned);
+                }
+            }
+            return 'https://via.placeholder.com/44x44?text=Sem+Foto';
+        }
 
         function initResizableColumns() {
             const table = document.getElementById('inventory-table');
@@ -218,18 +350,6 @@
             select.style.color = select.value === 'VENDIDO' ? '#008000' : '#000000';
         }
 
-        function getFirstPhotoUrl(item) {
-            if (item.links && item.links.length > 0 && item.links[0].startsWith('http')) {
-                return item.links[0];
-            }
-            if (item.linkRaw) {
-                const rawFirst = item.linkRaw.split(/,|\//)[0].trim();
-                const m = rawFirst.match(/id=([a-zA-Z0-9_-]+)/) || rawFirst.match(/\/d\/([a-zA-Z0-9_-]+)/);
-                if (m && m[1]) return "https://lh3.googleusercontent.com/d/" + m[1] + "=s800";
-            }
-            return 'https://via.placeholder.com/44x44?text=Sem+Foto';
-        }
-
         function renderAdminTable() {
             const tbody = document.getElementById('table-body');
             tbody.innerHTML = '';
@@ -262,8 +382,8 @@
                     <td style="text-align: center; font-weight: bold; background: #e8e8e8;">${item.rowIndex}</td>
                     <td style="text-align: center;">
                         <div class="admin-thumb-wrapper">
-                            <img class="admin-thumb-img" src="${photoUrl}" alt="Capa" loading="lazy" onerror="this.src='https://via.placeholder.com/44x44?text=Erro'">
-                            <img class="admin-thumb-preview" src="${photoUrl}" alt="Preview">
+                            <img class="admin-thumb-img" src="${photoUrl}" alt="Capa" loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/44x44?text=Erro'">
+                            <img class="admin-thumb-preview" src="${photoUrl}" alt="Preview" onerror="this.onerror=null; this.src='https://via.placeholder.com/140x140?text=Erro'">
                         </div>
                     </td>
                     <td>
@@ -307,6 +427,11 @@
             return String(text).replace(/"/g, '&quot;');
         }
 
+        function fecharModalErro() {
+            document.getElementById('win98-error-modal').style.display = 'none';
+            location.reload(); // Recarrega para buscar os dados frescos
+        }
+
         function salvarTudo() {
             saveCurrentPageEditsToMemory();
 
@@ -332,10 +457,10 @@
                 btn.innerText = originalText;
                 btn.disabled = false;
                 if (res.success) {
-                    alert("✓ " + res.message);
-                    location.reload();
+                    // Exibe a janela de ERRO 404 proposital ao invés do alert de sucesso
+                    document.getElementById('win98-error-modal').style.display = 'flex';
                 } else {
-                    alert("❌ " + res.message);
+                    alert("❌ Falha: " + res.message);
                 }
             })
             .catch(() => {

@@ -36,13 +36,13 @@
             <div class="section-title">📂 Categorias</div>
             <div class="cat-guide" id="category-guide"></div>
 
-            <!-- Destaques (12 aleatórios antes de selecionar categorias) -->
+            <!-- Destaques -->
             <div id="home-featured-section">
                 <div class="section-title">⭐ Destaques</div>
                 <div class="grid" id="featured-grid"></div>
             </div>
 
-            <!-- Catálogo Geral Paginado (Após Seleção, Máximo 12 por página) -->
+            <!-- Catálogo Geral Paginado -->
             <div class="section-title" id="main-catalog-title" style="display: none;">📦 Catálogo</div>
             <div class="grid" id="catalog-grid" style="display: none;">
                 <p style="text-align: center; grid-column: 1 / -1;">Carregando banco de dados...</p>
@@ -95,7 +95,7 @@
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwv8m5xK7gjdRR6ZWyxqUBrz0fYYLn0pBvTbAjweUuDQl5y7qfk0vZltXQEgTLFUi-unA/exec";
-        const WHATSAPP_NUMBER = "5541999999999"; // Substitua pelo seu WhatsApp com DDD
+        const WHATSAPP_NUMBER = "5541999999999";
 
         let allProducts = [];
         let cart = [];
@@ -128,30 +128,22 @@
                 });
         };
 
-        // Função universal para converter links brutos do Google Drive em links diretos do Google CDN
+        // ====== SOLUÇÃO DEFINITIVA PARA FOTOS DO GOOGLE DRIVE ======
         function resolveDrivePhoto(url) {
-            if (!url || typeof url !== 'string') {
-                return 'https://via.placeholder.com/240x180?text=Sem+Foto';
-            }
+            if (!url || typeof url !== 'string') return 'https://via.placeholder.com/240x180?text=Sem+Foto';
             url = url.trim();
-            if (url.includes('lh3.googleusercontent.com')) return url;
+            if (url.includes('drive.google.com/uc')) return url; 
 
-            const m1 = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-            const m2 = url.match(/id=([a-zA-Z0-9_-]+)/);
-            const m3 = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            // Extrai o ID do Google Drive de qualquer formato de link
+            const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/) || url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
 
-            let fileId = "";
-            if (m1 && m1[1]) fileId = m1[1];
-            else if (m2 && m2[1]) fileId = m2[1];
-            else if (m3 && m3[1]) fileId = m3[1];
-
-            if (fileId) {
-                return "https://lh3.googleusercontent.com/d/" + fileId + "=s800";
+            if (m && m[1]) {
+                // Endpoint universal sem restrições de CORS
+                return "https://drive.google.com/uc?export=view&id=" + m[1];
             }
             return url;
         }
 
-        // Obtém todas as fotos do item tratadas em uma lista
         function getItemPhotosList(item) {
             let list = [];
             if (item.links && Array.isArray(item.links) && item.links.length > 0) {
@@ -165,9 +157,7 @@
                     }
                 });
             }
-            if (list.length === 0) {
-                list.push('https://via.placeholder.com/240x180?text=Sem+Foto');
-            }
+            if (list.length === 0) list.push('https://via.placeholder.com/240x180?text=Sem+Foto');
             return list;
         }
 
@@ -273,7 +263,6 @@
             } else {
                 paginatedItems.forEach(item => grid.appendChild(createCardElement(item)));
             }
-
             renderPagination(totalPages);
         }
 
@@ -318,7 +307,7 @@
             card.innerHTML = `
                 <div class="img-box">
                     ${soldOverlayHTML}
-                    <img src="${mainPhoto}" alt="${item.nome}" loading="lazy" onerror="this.src='https://via.placeholder.com/240x180?text=Sem+Foto'">
+                    <img src="${mainPhoto}" alt="${item.nome}" loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/240x180?text=Imagem+Indisponível'">
                 </div>
                 <div class="card-info">
                     <span class="cat-tag">${item.categoria || 'Geral'}</span>
@@ -348,13 +337,13 @@
 
             const photos = getItemPhotosList(item);
             mainImg.src = photos[0];
-            mainImg.onerror = () => { mainImg.src = 'https://via.placeholder.com/400x300?text=Sem+Foto'; };
+            mainImg.onerror = function() { this.onerror=null; this.src = 'https://via.placeholder.com/400x300?text=Imagem+Indisponível'; };
 
             photos.forEach((link, idx) => {
                 const thumb = document.createElement('img');
                 thumb.className = `gallery-thumb ${idx === 0 ? 'active' : ''}`;
                 thumb.src = link;
-                thumb.onerror = () => { thumb.src = 'https://via.placeholder.com/50x50?text=Erro'; };
+                thumb.onerror = function() { this.onerror=null; this.src = 'https://via.placeholder.com/50x50?text=Erro'; };
                 thumb.onclick = () => {
                     mainImg.src = link;
                     document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
