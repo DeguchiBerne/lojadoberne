@@ -3,203 +3,451 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loja do Berne - Catálogo</title>
-    <style>
-        :root {
-            --primary: #2563eb;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text: #1e293b;
-            --sold-overlay: rgba(239, 68, 68, 0.85);
-        }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text); 
-            margin: 0; 
-            padding: 20px; 
-        }
-        header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            max-width: 1200px; 
-            margin: 0 auto 30px auto; 
-            border-bottom: 2px solid #e2e8f0; 
-            padding-bottom: 15px; 
-        }
-        h1 { 
-            margin: 0; 
-            color: #0f172a; 
-            font-size: 24px; 
-        }
-        .admin-link { 
-            font-size: 13px; 
-            color: var(--primary); 
-            text-decoration: none; 
-            font-weight: bold; 
-            padding: 6px 12px; 
-            border: 1px solid var(--primary); 
-            border-radius: 6px; 
-            transition: all 0.2s; 
-        }
-        .admin-link:hover { 
-            background-color: var(--primary); 
-            color: white; 
-        }
-        .container { 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-            gap: 20px; 
-        }
-        .card { 
-            background: var(--card-bg); 
-            border-radius: 12px; 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
-            overflow: hidden; 
-            display: flex; 
-            flex-direction: column; 
-            position: relative; 
-            transition: transform 0.2s;
-        }
-        .card:hover { transform: translateY(-4px); }
-        .image-container { 
-            width: 100%; 
-            height: 220px; 
-            background: #e2e8f0; 
-            position: relative; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            overflow: hidden; 
-        }
-        .image-container img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-        }
-        .sold-badge { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background-color: var(--sold-overlay); 
-            color: white; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 32px; 
-            font-weight: bold; 
-            letter-spacing: 2px; 
-            text-transform: uppercase; 
-            transform: rotate(-15deg); 
-            z-index: 5; 
-            pointer-events: none; 
-            box-shadow: 0 0 15px rgba(0,0,0,0.3);
-        }
-        .card-content { 
-            padding: 15px; 
-            display: flex; 
-            flex-direction: column; 
-            flex-grow: 1; 
-            justify-content: space-between; 
-        }
-        .category { 
-            font-size: 11px; 
-            text-transform: uppercase; 
-            font-weight: bold; 
-            color: var(--primary); 
-            margin-bottom: 5px; 
-        }
-        .title { 
-            font-size: 16px; 
-            font-weight: bold; 
-            margin: 0 0 8px 0; 
-            color: #1e293b; 
-        }
-        .description { 
-            font-size: 13px; 
-            color: #64748b; 
-            margin-bottom: 12px; 
-            flex-grow: 1; 
-        }
-        .footer-card { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-top: 10px; 
-            border-top: 1px solid #f1f5f9; 
-            padding-top: 10px; 
-        }
-        .price { 
-            font-size: 18px; 
-            font-weight: bold; 
-            color: #059669; 
-        }
-    </style>
+    <title>:: Loja do Berne - Catálogo Retrô ::</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="theme-win98" id="body-tag">
 
-    <header>
-        <h1>Loja do Berne - Catálogo</h1>
-        <a href="admin.html" class="admin-link">Área Administrativa</a>
-    </header>
+    <div class="window-frame">
+        <div class="titlebar">
+            <span>[EXE] Loja_do_Berne_Catálogo.exe</span>
+            <span>[_][O][X]</span>
+        </div>
+        <div class="content-area">
+            
+            <div class="marquee-box">
+                <marquee scrollamount="4">Bem-vindo à Loja do Berne! Clique em qualquer item para ver fotos detalhadas. Monte seu carrinho e envie para o WhatsApp!</marquee>
+            </div>
 
-    <div class="container" id="catalog-grid">
-        <p style="text-align: center; grid-column: 1 / -1;">Carregando anúncios...</p>
+            <header>
+                <div class="brand-wrapper">
+                    <h1>LOJA DO BERNE</h1>
+                    <div class="counter-badge">
+                        VISITAS<a href="admin.html" class="secret-colon" title="...">:</a> <span id="visitor-count">000000</span>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn-retro" onclick="toggleTheme()">Mudar Tema (Win98 / Neon 90s)</button>
+                </div>
+            </header>
+
+            <div class="section-title">📂 Categorias</div>
+            <div class="cat-guide" id="category-guide"></div>
+
+            <div id="home-featured-section">
+                <div class="section-title">⭐ Destaques</div>
+                <div class="grid" id="featured-grid"></div>
+            </div>
+
+            <div class="section-title" id="main-catalog-title" style="display: none;">📦 Catálogo</div>
+            <div class="grid" id="catalog-grid" style="display: none;">
+                <p style="text-align: center; grid-column: 1 / -1;">Carregando banco de dados...</p>
+            </div>
+
+            <div class="pagination" id="pagination-controls" style="display: none;"></div>
+
+        </div>
+    </div>
+
+    <!-- Modal com Galeria -->
+    <div class="modal-overlay" id="product-modal">
+        <div class="modal-window">
+            <div class="modal-titlebar">
+                <span id="modal-item-title">Detalhes do Item</span>
+                <button class="close-modal-btn" onclick="closeModal()">X</button>
+            </div>
+            <div class="modal-body">
+                <div class="gallery-main-box">
+                    <img id="modal-main-img" src="" alt="Imagem Principal">
+                </div>
+                <div class="gallery-thumbs" id="modal-thumbs"></div>
+                <div style="margin-bottom: 8px;">
+                    <span class="cat-tag" id="modal-item-cat">Categoria</span>
+                    <h3 style="margin: 6px 0;" id="modal-item-name">Nome do Item</h3>
+                    <div class="price" id="modal-item-price" style="display:inline-block;">R$ 0,00</div>
+                </div>
+                <div style="font-size: 12px; line-height: 1.4; border-top: 1px dotted #888; padding-top: 8px; margin-bottom: 12px;" id="modal-item-desc"></div>
+                <button id="modal-cart-btn" class="cart-btn">🛒 Adicionar ao Carrinho</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Carrinho Flutuante -->
+    <div class="floating-cart minimized" id="floating-cart">
+        <div class="fc-header" onclick="toggleCartMinimize()">
+            <span id="fc-title">🛒 Carrinho (0) - R$ 0,00</span>
+            <span id="fc-toggle-icon">▲ Subir</span>
+        </div>
+        <div class="fc-body" id="fc-items-list">
+            <div style="text-align: center; color: #777;">Carrinho vazio.</div>
+        </div>
+        <div class="fc-footer">
+            <div style="font-weight: bold; font-size: 14px;">Total: <span id="fc-total">R$ 0,00</span></div>
+            <a href="#" id="wpp-btn" class="wpp-btn disabled" onclick="enviarCarrinhoWhatsApp(event)">
+                💬 Enviar Carrinho pro WhatsApp
+            </a>
+        </div>
     </div>
 
     <script>
-        // Substitua pela URL do seu Web App implantado no Google Apps Script
         const API_URL = "https://script.google.com/macros/s/AKfycbwv8m5xK7gjdRR6ZWyxqUBrz0fYYLn0pBvTbAjweUuDQl5y7qfk0vZltXQEgTLFUi-unA/exec";
+        const WHATSAPP_NUMBER = "5541999999999";
+
+        let allProducts = [];
+        let cart = [];
+        let selectedCategories = new Set();
+        let currentPage = 1;
+        const ITEMS_PER_PAGE = 12;
+        let isCartMinimized = true;
 
         window.onload = function() {
+            let savedTheme = localStorage.getItem('berne_theme');
+            if (savedTheme) document.getElementById('body-tag').className = savedTheme;
+
+            let visitas = localStorage.getItem('berne_visitas') || 1350;
+            if (!sessionStorage.getItem('visited')) {
+                visitas++;
+                localStorage.setItem('berne_visitas', visitas);
+                sessionStorage.setItem('visited', 'true');
+            }
+            document.getElementById('visitor-count').innerText = String(visitas).padStart(6, '0');
+
             fetch(API_URL + "?action=getData")
-                .then(response => response.json())
-                .then(items => renderCatalog(items))
-                .catch(err => {
-                    document.getElementById('catalog-grid').innerHTML = '<p style="color:red; text-align:center;">Erro ao carregar os anúncios. Verifique a URL da API.</p>';
+                .then(r => r.json())
+                .then(items => {
+                    allProducts = items;
+                    buildCategoryGuide(items);
+                    renderRandomFeatured(items);
+                })
+                .catch(() => {
+                    document.getElementById('featured-grid').innerHTML = '<p style="color:red; text-align:center;">Falha de conexão com o servidor.</p>';
                 });
         };
 
-        function renderCatalog(items) {
-            const grid = document.getElementById('catalog-grid');
-            grid.innerHTML = '';
+        // Método padrão exato da biblioteca que funcionava
+        function resolveDrivePhoto(url) {
+            if (!url) return 'https://via.placeholder.com/240x180?text=Sem+Foto';
+            url = url.trim();
+            if (url.includes('lh3.googleusercontent.com/d/')) return url;
 
-            if (!items || items.length === 0) {
-                grid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Nenhum item cadastrado.</p>';
+            const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/) || url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+            if (m && m[1]) return "https://lh3.googleusercontent.com/d/" + m[1];
+            return url;
+        }
+
+        function getItemPhotosList(item) {
+            let list = [];
+            if (item.links && Array.isArray(item.links) && item.links.length > 0) {
+                list = item.links.map(l => resolveDrivePhoto(l));
+            } else if (item.linkRaw) {
+                let parts = String(item.linkRaw).split(/,|\//);
+                parts.forEach(p => {
+                    let cleaned = p.trim();
+                    if (cleaned.startsWith('http')) list.push(resolveDrivePhoto(cleaned));
+                });
+            }
+            if (list.length === 0) list.push('https://via.placeholder.com/240x180?text=Sem+Foto');
+            return list;
+        }
+
+        function toggleTheme() {
+            const body = document.getElementById('body-tag');
+            body.className = body.classList.contains('theme-win98') ? 'theme-neon' : 'theme-win98';
+            localStorage.setItem('berne_theme', body.className);
+        }
+
+        function buildCategoryGuide(items) {
+            const guide = document.getElementById('category-guide');
+            guide.innerHTML = '';
+            
+            const btnAll = document.createElement('div');
+            btnAll.className = 'cat-checkbox-btn selected';
+            btnAll.id = 'cat-all-btn';
+            btnAll.innerText = '✓ [ TODAS ]';
+            btnAll.onclick = () => resetCategories();
+            guide.appendChild(btnAll);
+
+            const categories = [...new Set(items.map(i => i.categoria || 'Geral'))].sort();
+            categories.forEach(cat => {
+                const btn = document.createElement('div');
+                btn.className = 'cat-checkbox-btn';
+                btn.dataset.cat = cat;
+                btn.innerText = `+ ${cat}`;
+                btn.onclick = () => toggleCategory(cat, btn);
+                guide.appendChild(btn);
+            });
+        }
+
+        function resetCategories() {
+            selectedCategories.clear();
+            document.querySelectorAll('.cat-checkbox-btn').forEach(b => {
+                b.classList.remove('selected');
+                if (b.id !== 'cat-all-btn') b.innerText = `+ ${b.dataset.cat}`;
+            });
+            document.getElementById('cat-all-btn').classList.add('selected');
+            document.getElementById('cat-all-btn').innerText = '✓ [ TODAS ]';
+
+            document.getElementById('home-featured-section').style.display = 'block';
+            document.getElementById('main-catalog-title').style.display = 'none';
+            document.getElementById('catalog-grid').style.display = 'none';
+            document.getElementById('pagination-controls').style.display = 'none';
+            renderRandomFeatured(allProducts);
+        }
+
+        function toggleCategory(cat, btn) {
+            document.getElementById('cat-all-btn').classList.remove('selected');
+            document.getElementById('cat-all-btn').innerText = '[ VER TODAS ]';
+
+            if (selectedCategories.has(cat)) {
+                selectedCategories.delete(cat);
+                btn.classList.remove('selected');
+                btn.innerText = `+ ${cat}`;
+            } else {
+                selectedCategories.add(cat);
+                btn.classList.add('selected');
+                btn.innerText = `✓ ${cat}`;
+            }
+
+            if (selectedCategories.size === 0) {
+                resetCategories();
                 return;
             }
 
-            items.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'card';
+            document.getElementById('home-featured-section').style.display = 'none';
+            document.getElementById('main-catalog-title').style.display = 'block';
+            document.getElementById('catalog-grid').style.display = 'grid';
+            document.getElementById('pagination-controls').style.display = 'flex';
 
-                // Pega a primeira foto da lista de links se houver
-                let imgUrl = (item.links && item.links.length > 0) ? item.links[0] : 'https://via.placeholder.com/280x220?text=Sem+Foto';
-                let soldOverlayHTML = item.vendido ? '<div class="sold-badge">Vendido</div>' : '';
+            currentPage = 1;
+            renderFilteredCatalog();
+        }
 
-                card.innerHTML = `
-                    <div class="image-container">
-                        ${soldOverlayHTML}
-                        <img src="${imgUrl}" alt="${item.nome}" loading="lazy" onerror="this.src='https://via.placeholder.com/280x220?text=Erro+Foto'">
-                    </div>
-                    <div class="card-content">
-                        <div>
-                            <div class="category">${item.categoria || 'Geral'}</div>
-                            <h2 class="title">${item.nome}</h2>
-                            <div class="description">${item.descricao || 'Sem descrição.'}</div>
-                        </div>
-                        <div class="footer-card">
-                            <div class="price">R$ ${item.preco ? Number(item.preco).toFixed(2).replace('.', ',') : '0,00'}</div>
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
+        function renderRandomFeatured(items) {
+            const grid = document.getElementById('featured-grid');
+            grid.innerHTML = '';
+            
+            const available = items.filter(i => i.status !== "VENDIDO");
+            const shuffled = [...available].sort(() => 0.5 - Math.random());
+            const selected12 = shuffled.slice(0, 12);
+
+            selected12.forEach(item => {
+                grid.appendChild(createCardElement(item));
             });
+        }
+
+        function renderFilteredCatalog() {
+            const filtered = allProducts.filter(i => selectedCategories.has(i.categoria || 'Geral'));
+            const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1;
+            if (currentPage > totalPages) currentPage = 1;
+
+            const start = (currentPage - 1) * ITEMS_PER_PAGE;
+            const end = start + ITEMS_PER_PAGE;
+            const paginatedItems = filtered.slice(start, end);
+
+            const grid = document.getElementById('catalog-grid');
+            grid.innerHTML = '';
+
+            if (paginatedItems.length === 0) {
+                grid.innerHTML = '<p style="text-align:center; grid-column:1/-1;">Nenhum item encontrado nesta seleção.</p>';
+            } else {
+                paginatedItems.forEach(item => grid.appendChild(createCardElement(item)));
+            }
+            renderPagination(totalPages);
+        }
+
+        function renderPagination(totalPages) {
+            const container = document.getElementById('pagination-controls');
+            container.innerHTML = '';
+            if (totalPages <= 1) return;
+
+            for (let p = 1; p <= totalPages; p++) {
+                const btn = document.createElement('button');
+                btn.className = `page-btn ${p === currentPage ? 'active' : ''}`;
+                btn.innerText = p;
+                btn.onclick = () => {
+                    currentPage = p;
+                    renderFilteredCatalog();
+                    window.scrollTo({ top: 400, behavior: 'smooth' });
+                };
+                container.appendChild(btn);
+            }
+        }
+
+        function createCardElement(item) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.onclick = (e) => {
+                if (e.target.tagName !== 'BUTTON') openModal(item);
+            };
+
+            const photos = getItemPhotosList(item);
+            const mainPhoto = photos[0];
+
+            let soldOverlayHTML = item.status === "VENDIDO" ? '<div class="sold-badge">VENDIDO</div>' : '';
+            let precoFormatado = item.preco ? Number(item.preco).toFixed(2).replace('.', ',') : '0,00';
+            let inCart = cart.some(c => c.rowIndex === item.rowIndex);
+
+            let btnHtml = item.status === "VENDIDO"
+                ? `<button class="cart-btn disabled" disabled>Indisponível</button>`
+                : (inCart 
+                    ? `<button class="cart-btn added" onclick="event.stopPropagation(); toggleCart(${item.rowIndex})">✓ No Carrinho</button>` 
+                    : `<button class="cart-btn" onclick="event.stopPropagation(); toggleCart(${item.rowIndex})">🛒 Adicionar ao Carrinho</button>`);
+
+            card.innerHTML = `
+                <div class="img-box">
+                    ${soldOverlayHTML}
+                    <img src="${mainPhoto}" alt="${item.nome}" loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/240x180?text=Erro'">
+                </div>
+                <div class="card-info">
+                    <span class="cat-tag">${item.categoria || 'Geral'}</span>
+                    <div class="item-title" title="${item.nome}">${item.nome}</div>
+                </div>
+                <div class="card-footer">
+                    <div class="price-row">
+                        <div class="price">R$ ${precoFormatado}</div>
+                    </div>
+                    ${btnHtml}
+                </div>
+            `;
+            return card;
+        }
+
+        function openModal(item) {
+            const modal = document.getElementById('product-modal');
+            document.getElementById('modal-item-title').innerText = `Visualizador: ${item.nome}`;
+            document.getElementById('modal-item-name').innerText = item.nome;
+            document.getElementById('modal-item-cat').innerText = item.categoria || 'Geral';
+            document.getElementById('modal-item-desc').innerText = item.descricao || 'Sem descrição cadastrada.';
+            document.getElementById('modal-item-price').innerText = `R$ ${item.preco ? Number(item.preco).toFixed(2).replace('.', ',') : '0,00'}`;
+
+            const mainImg = document.getElementById('modal-main-img');
+            const thumbsContainer = document.getElementById('modal-thumbs');
+            thumbsContainer.innerHTML = '';
+
+            const photos = getItemPhotosList(item);
+            mainImg.src = photos[0];
+            mainImg.onerror = function() { this.onerror=null; this.src = 'https://via.placeholder.com/400x300?text=Erro'; };
+
+            photos.forEach((link, idx) => {
+                const thumb = document.createElement('img');
+                thumb.className = `gallery-thumb ${idx === 0 ? 'active' : ''}`;
+                thumb.src = link;
+                thumb.onerror = function() { this.onerror=null; this.src = 'https://via.placeholder.com/50x50?text=Erro'; };
+                thumb.onclick = () => {
+                    mainImg.src = link;
+                    document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+                    thumb.classList.add('active');
+                };
+                thumbsContainer.appendChild(thumb);
+            });
+
+            const cartBtn = document.getElementById('modal-cart-btn');
+            const inCart = cart.some(c => c.rowIndex === item.rowIndex);
+            if (item.status === "VENDIDO") {
+                cartBtn.className = 'cart-btn disabled';
+                cartBtn.innerText = 'Item Indisponível';
+                cartBtn.onclick = null;
+            } else {
+                cartBtn.className = inCart ? 'cart-btn added' : 'cart-btn';
+                cartBtn.innerText = inCart ? '✓ No Carrinho' : '🛒 Adicionar ao Carrinho';
+                cartBtn.onclick = () => {
+                    toggleCart(item.rowIndex);
+                    openModal(item);
+                };
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('product-modal').style.display = 'none';
+        }
+
+        function toggleCart(rowIndex) {
+            const idx = cart.findIndex(i => i.rowIndex === rowIndex);
+            if (idx > -1) {
+                cart.splice(idx, 1);
+            } else {
+                const p = allProducts.find(x => x.rowIndex === rowIndex);
+                if (p && p.status !== "VENDIDO") cart.push(p);
+            }
+
+            if (selectedCategories.size === 0) {
+                renderRandomFeatured(allProducts);
+            } else {
+                renderFilteredCatalog();
+            }
+            updateCartUI();
+        }
+
+        function removerDoCarrinho(rowIndex) {
+            const idx = cart.findIndex(i => i.rowIndex === rowIndex);
+            if (idx > -1) {
+                cart.splice(idx, 1);
+                if (selectedCategories.size === 0) {
+                    renderRandomFeatured(allProducts);
+                } else {
+                    renderFilteredCatalog();
+                }
+                updateCartUI();
+            }
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('fc-items-list');
+            const titleEl = document.getElementById('fc-title');
+            const totalEl = document.getElementById('fc-total');
+            const wppBtn = document.getElementById('wpp-btn');
+
+            let total = 0;
+            cart.forEach(i => total += Number(i.preco || 0));
+            let totalFmt = total.toFixed(2).replace('.', ',');
+
+            titleEl.innerText = `🛒 Carrinho (${cart.length}) - R$ ${totalFmt}`;
+            totalEl.innerText = `R$ ${totalFmt}`;
+
+            if (cart.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:10px;">Carrinho vazio.</div>`;
+                wppBtn.classList.add('disabled');
+                return;
+            }
+
+            let html = '';
+            cart.forEach(item => {
+                html += `
+                    <div class="fc-item">
+                        <button class="fc-item-remove" onclick="removerDoCarrinho(${item.rowIndex})" title="Remover item">X</button>
+                        <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:170px;">${item.nome}</span>
+                        <span style="font-weight:bold;">R$ ${Number(item.preco).toFixed(2).replace('.', ',')}</span>
+                    </div>`;
+            });
+            container.innerHTML = html;
+            wppBtn.classList.remove('disabled');
+        }
+
+        function toggleCartMinimize() {
+            const cartEl = document.getElementById('floating-cart');
+            const iconEl = document.getElementById('fc-toggle-icon');
+            isCartMinimized = !isCartMinimized;
+            cartEl.classList.toggle('minimized', isCartMinimized);
+            iconEl.innerText = isCartMinimized ? "▲ Subir" : "▼ Descer";
+        }
+
+        function enviarCarrinhoWhatsApp(e) {
+            e.preventDefault();
+            if (cart.length === 0) return;
+
+            let total = 0;
+            let msg = "Olá! Tenho interesse nos seguintes itens do carrinho:\n\n";
+
+            cart.forEach((item, idx) => {
+                let p = Number(item.preco || 0);
+                total += p;
+                msg += `${idx + 1}. *${item.nome}* - R$ ${p.toFixed(2).replace('.', ',')}\n`;
+            });
+
+            msg += `\n*Total de Itens:* ${cart.length}\n*Valor Total:* R$ ${total.toFixed(2).replace('.', ',')}\n\nPodemos fechar a negociação?`;
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
         }
     </script>
 </body>

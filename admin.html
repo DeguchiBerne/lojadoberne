@@ -3,152 +3,335 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Admin - Loja do Berne</title>
+    <title>:: Painel Admin - Planilha Windows 98 ::</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        :root {
-            --primary: #2563eb;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text: #1e293b;
-            --sold-overlay: rgba(239, 68, 68, 0.85);
-        }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        header { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto 30px auto; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; }
-        h1 { margin: 0; color: #0f172a; font-size: 24px; }
-        .back-link { font-size: 13px; color: #475569; text-decoration: none; font-weight: bold; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px; transition: all 0.2s; }
-        .back-link:hover { background-color: #e2e8f0; }
-        .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; flex-direction: column; position: relative; }
-        .image-container { width: 100%; height: 220px; background: #e2e8f0; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .image-container img { width: 100%; height: 100%; object-fit: cover; }
-        .sold-badge { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--sold-overlay); color: white; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; transform: rotate(-15deg); z-index: 5; pointer-events: none; }
-        .card-content { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
-        .category { font-size: 11px; text-transform: uppercase; font-weight: bold; color: var(--primary); margin-bottom: 5px; }
-        .title { font-size: 16px; font-weight: bold; margin: 0 0 8px 0; color: #1e293b; }
-        .description { font-size: 13px; color: #64748b; margin-bottom: 12px; flex-grow: 1; }
-        .footer-card { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px solid #f1f5f9; padding-top: 10px; }
-        .price { font-size: 18px; font-weight: bold; color: #059669; }
-        .admin-btn { background-color: #475569; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: background 0.2s; }
-        .admin-btn:hover { background-color: #334155; }
-        
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 100; }
-        .modal-content { background: white; padding: 25px; border-radius: 12px; width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; }
-        .modal-content input { width: 90%; padding: 10px; margin: 15px 0; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
-        .modal-buttons { display: flex; justify-content: space-between; gap: 10px; }
-        .modal-buttons button { flex: 1; padding: 8px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-confirm { background: var(--primary); color: white; }
-        .btn-cancel { background: #e2e8f0; color: #475569; }
+        .admin-thumb-wrapper { position: relative; display: inline-block; }
+        .admin-thumb-img { width: 44px; height: 44px; object-fit: cover; border: 1px solid #7f9db9; background: #fff; display: block; cursor: pointer; }
+        .admin-thumb-wrapper:hover .admin-thumb-preview { display: block; }
+        .admin-thumb-preview { display: none; position: absolute; left: 50px; top: -20px; width: 140px; height: 140px; object-fit: contain; background: #000; border: 2px solid #000080; box-shadow: 4px 4px 10px rgba(0,0,0,0.5); z-index: 100; }
+
+        /* Modal Win98 Erro 404 (Prank de Sucesso) */
+        .win98-msgbox-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 5000; align-items: center; justify-content: center; }
+        .win98-msgbox { background: #c0c0c0; border-top: 1px solid #fff; border-left: 1px solid #fff; border-right: 1px solid #000; border-bottom: 1px solid #000; box-shadow: inset 1px 1px #dfdfdf, inset -1px -1px #808080, 4px 4px 10px rgba(0,0,0,0.5); width: 320px; font-family: Tahoma, sans-serif; color: #000; }
+        .win98-msgbox-title { background: #000080; color: #fff; padding: 3px 5px; font-weight: bold; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .win98-msgbox-close { background: #c0c0c0; border-top: 1px solid #fff; border-left: 1px solid #fff; border-right: 1px solid #000; border-bottom: 1px solid #000; font-size: 10px; font-weight: bold; line-height: 1; padding: 1px 4px; cursor: pointer; color: black; }
+        .win98-msgbox-content { padding: 20px; display: flex; align-items: flex-start; gap: 15px; }
+        .win98-icon-error { width: 32px; height: 32px; background: red; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 24px; border: 2px solid #800000; flex-shrink: 0; }
+        .win98-msgbox-text { font-size: 13px; line-height: 1.4; }
+        .win98-msgbox-footer { text-align: center; padding-bottom: 15px; }
+        .win98-btn { background: #c0c0c0; border-top: 1px solid #fff; border-left: 1px solid #fff; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 25px; font-size: 12px; font-family: Tahoma, sans-serif; cursor: pointer; color: black; }
+        .win98-btn:active { border-top: 1px solid #000; border-left: 1px solid #000; border-right: 1px solid #fff; border-bottom: 1px solid #fff; }
     </style>
 </head>
-<body>
+<body class="theme-win98">
 
-    <header>
-        <h1>Painel Administrativo - Loja do Berne</h1>
-        <a href="index.html" class="back-link">Ver Catálogo Público</a>
-    </header>
-
-    <div class="container" id="catalog-grid">
-        <p style="text-align: center; grid-column: 1 / -1;">Carregando painel...</p>
-    </div>
-
-    <div class="modal" id="adminModal">
-        <div class="modal-content">
-            <h3>Acesso Administrativo</h3>
-            <p style="font-size: 13px; color: #64748b;">Digite a senha para alterar o status do item:</p>
-            <input type="password" id="adminPassword" placeholder="Senha administrativa">
-            <div class="modal-buttons">
-                <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-                <button class="btn-confirm" onclick="submitAdminAction()">Confirmar</button>
+    <!-- Modal ERRO 404 (Prank de Sucesso) -->
+    <div class="win98-msgbox-overlay" id="win98-error-modal">
+        <div class="win98-msgbox">
+            <div class="win98-msgbox-title">
+                <span>Erro de Sistema Crítico</span>
+                <button class="win98-msgbox-close" onclick="fecharModalErro()">X</button>
+            </div>
+            <div class="win98-msgbox-content">
+                <div class="win98-icon-error">X</div>
+                <div class="win98-msgbox-text">
+                    <strong>ERRO 404 - FATAL</strong><br><br>
+                    Brincadeirinha, as alterações foram salvas com sucesso na planilha base! 😎
+                </div>
+            </div>
+            <div class="win98-msgbox-footer">
+                <button class="win98-btn" onclick="fecharModalErro()">OK</button>
             </div>
         </div>
     </div>
 
+    <div class="window-frame">
+        <div class="titlebar">
+            <span>[ADMIN] Editor_de_Inventario_Win98.xls</span>
+            <a href="index.html" style="color:white; text-decoration:none; font-weight:bold;">[ X ]</a>
+        </div>
+        <div class="content-area">
+
+            <header style="margin-bottom: 10px; display:flex; justify-content:space-between; align-items:center; flex-direction:row;">
+                <h1 style="font-size: 26px; margin: 0;">PAINEL DE INVENTÁRIO</h1>
+                <div class="controls">
+                    <a href="index.html" class="btn-retro">⬅️ Voltar ao Catálogo</a>
+                </div>
+            </header>
+
+            <div class="admin-toolbar">
+                <label><strong>🔍 Buscar:</strong></label>
+                <input type="text" id="admin-search" placeholder="Filtrar por nome, descrição, arquivo..." oninput="onFilterChange()" style="width: 250px;">
+
+                <label style="margin-left: 10px;"><strong>📂 Categoria:</strong></label>
+                <select id="admin-cat-filter" onchange="onFilterChange()" style="min-width: 150px;">
+                    <option value="">Todas as Categorias</option>
+                </select>
+                <span id="admin-count-info" style="margin-left: auto; font-size: 11px; font-weight: bold;">Carregando...</span>
+            </div>
+
+            <div class="admin-table-container">
+                <table class="win98-table" id="inventory-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 45px;">Linha</th>
+                            <th style="width: 65px;">Capa</th>
+                            <th style="width: 105px;">Status</th>
+                            <th style="width: 140px;">Categoria</th>
+                            <th style="width: 200px;">Nome do Item</th>
+                            <th style="width: 250px;">Descrição</th>
+                            <th style="width: 80px;">Preço</th>
+                            <th style="width: 200px;">Links das Fotos</th>
+                            <th style="width: 140px;">Arquivo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <tr>
+                            <td colspan="9" style="text-align: center; padding: 25px;">Carregando banco de dados...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination" id="admin-pagination"></div>
+
+            <div style="text-align: right; margin-top: 15px; border-top: 2px dashed #808080; padding-top: 15px;">
+                <button id="btn-save-bottom" class="btn-retro" style="background:#28a745; color:white; padding: 10px 24px; font-size: 14px;" onclick="salvarTudo()">
+                    💾 SALVAR TODAS AS ALTERAÇÕES NA PLANILHA
+                </button>
+            </div>
+
+        </div>
+    </div>
+
     <script>
-        const API_URL = "SUA_URL_DO_WEB_APP_AQUI";
-        let selectedRowIndex = null;
+        const API_URL = "https://script.google.com/macros/s/AKfycbwv8m5xK7gjdRR6ZWyxqUBrz0fYYLn0pBvTbAjweUuDQl5y7qfk0vZltXQEgTLFUi-unA/exec";
+        
+        let rawItems = [];
+        let filteredItems = [];
+        let currentPage = 1;
+        const PAGE_SIZE = 20;
 
         window.onload = function() {
-            loadCatalog();
+            fetch(API_URL + "?action=getData")
+                .then(r => r.json())
+                .then(items => {
+                    rawItems = items;
+                    populateCategoryDropdown(items);
+                    onFilterChange();
+                    initResizableColumns();
+                })
+                .catch(() => {
+                    document.getElementById('table-body').innerHTML = '<tr><td colspan="9" style="color:red; text-align:center;">Erro ao carregar dados da planilha.</td></tr>';
+                });
         };
 
-        function loadCatalog() {
-            fetch(API_URL + "?action=getData")
-                .then(response => response.json())
-                .then(items => renderCatalog(items))
-                .catch(err => {
-                    document.getElementById('catalog-grid').innerHTML = '<p style="color:red; text-align:center;">Erro ao carregar os dados.</p>';
-                });
+        function resolveDrivePhoto(url) {
+            if (!url) return 'https://via.placeholder.com/44x44?text=Sem+Foto';
+            url = url.trim();
+            if (url.includes('lh3.googleusercontent.com/d/')) return url;
+
+            const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/) || url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+            if (m && m[1]) return "https://lh3.googleusercontent.com/d/" + m[1];
+            return url;
         }
 
-        function renderCatalog(items) {
-            const grid = document.getElementById('catalog-grid');
-            grid.innerHTML = '';
-
-            if (!items || items.length === 0) {
-                grid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Nenhum item encontrado.</p>';
-                return;
+        function getFirstPhotoUrl(item) {
+            if (item.linkRaw) {
+                let parts = String(item.linkRaw).split(/,|\//);
+                for (let i = 0; i < parts.length; i++) {
+                    let cleaned = parts[i].trim();
+                    if (cleaned.startsWith('http')) return resolveDrivePhoto(cleaned);
+                }
             }
+            return 'https://via.placeholder.com/44x44?text=Sem+Foto';
+        }
 
-            items.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'card';
+        function initResizableColumns() {
+            const table = document.getElementById('inventory-table');
+            const cols = table.querySelectorAll('th');
 
-                let imgUrl = (item.links && item.links.length > 0) ? item.links[0] : 'https://via.placeholder.com/280x220?text=Sem+Foto';
-                let soldOverlayHTML = item.vendido ? '<div class="sold-badge">Vendido</div>' : '';
+            cols.forEach(col => {
+                if (col.querySelector('.resizer')) return;
+                const resizer = document.createElement('div');
+                resizer.classList.add('resizer');
+                col.appendChild(resizer);
 
-                card.innerHTML = `
-                    <div class="image-container">
-                        ${soldOverlayHTML}
-                        <img src="${imgUrl}" alt="${item.nome}" loading="lazy" onerror="this.src='https://via.placeholder.com/280x220?text=Erro+Foto'">
-                    </div>
-                    <div class="card-content">
-                        <div>
-                            <div class="category">${item.categoria || 'Geral'}</div>
-                            <h2 class="title">${item.nome}</h2>
-                            <div class="description">${item.descricao || 'Sem descrição.'}</div>
-                        </div>
-                        <div class="footer-card">
-                            <div class="price">R$ ${item.preco ? Number(item.preco).toFixed(2).replace('.', ',') : '0,00'}</div>
-                            <button class="admin-btn" onclick="openAdminModal(${item.rowIndex})">
-                                ${item.vendido ? 'Desfazer Venda' : 'Marcar Vendido'}
-                            </button>
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
+                let startX, startWidth;
+                resizer.addEventListener('mousedown', function(e) {
+                    e.preventDefault(); e.stopPropagation();
+                    startX = e.pageX; startWidth = col.offsetWidth;
+                    resizer.classList.add('resizing');
+                    function onMouseMove(moveEvent) {
+                        const newWidth = startWidth + (moveEvent.pageX - startX);
+                        if (newWidth > 35) col.style.width = newWidth + 'px';
+                    }
+                    function onMouseUp() {
+                        resizer.classList.remove('resizing');
+                        document.removeEventListener('mousemove', onMouseMove);
+                        document.removeEventListener('mouseup', onMouseUp);
+                    }
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                });
             });
         }
 
-        function openAdminModal(rowIndex) {
-            selectedRowIndex = rowIndex;
-            document.getElementById('adminPassword').value = '';
-            document.getElementById('adminModal').style.display = 'flex';
-            document.getElementById('adminPassword').focus();
+        function populateCategoryDropdown(items) {
+            const select = document.getElementById('admin-cat-filter');
+            const cats = [...new Set(items.map(i => i.categoria || 'Geral'))].sort();
+            cats.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c; opt.innerText = c; select.appendChild(opt);
+            });
         }
 
-        function closeModal() {
-            document.getElementById('adminModal').style.display = 'none';
-            selectedRowIndex = null;
+        function onFilterChange() {
+            saveCurrentPageEditsToMemory();
+            const term = document.getElementById('admin-search').value.toLowerCase().trim();
+            const cat = document.getElementById('admin-cat-filter').value;
+
+            filteredItems = rawItems.filter(item => {
+                const matchCat = !cat || (item.categoria || 'Geral') === cat;
+                const matchTerm = !term || 
+                    String(item.nome || '').toLowerCase().includes(term) ||
+                    String(item.descricao || '').toLowerCase().includes(term) ||
+                    String(item.arquivo || '').toLowerCase().includes(term) ||
+                    String(item.rowIndex).includes(term);
+                return matchCat && matchTerm;
+            });
+
+            currentPage = 1;
+            renderAdminTable();
         }
 
-        function submitAdminAction() {
-            const password = document.getElementById('adminPassword').value;
-            if (!password) {
-                alert('Por favor, digite a senha.');
+        function saveCurrentPageEditsToMemory() {
+            const rows = document.querySelectorAll('#table-body tr');
+            rows.forEach(tr => {
+                const rIndex = Number(tr.dataset.rowindex);
+                if (!rIndex) return;
+
+                const item = rawItems.find(i => i.rowIndex === rIndex);
+                if (item) {
+                    item.status = tr.querySelector('.f-status').value;
+                    item.categoria = tr.querySelector('.f-cat').value;
+                    item.nome = tr.querySelector('.f-nome').value;
+                    item.descricao = tr.querySelector('.f-desc').value;
+                    item.preco = tr.querySelector('.f-preco').value;
+                    item.linkRaw = tr.querySelector('.f-link').value;
+                    item.arquivo = tr.querySelector('.f-arq').value;
+                }
+            });
+        }
+
+        function updateStatusColor(select) { select.style.color = select.value === 'VENDIDO' ? '#008000' : '#000000'; }
+
+        function renderAdminTable() {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+            const total = filteredItems.length;
+            document.getElementById('admin-count-info').innerText = `Total: ${total} item(ns)`;
+
+            if (total === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:15px;">Nenhum item correspondente ao filtro.</td></tr>';
+                document.getElementById('admin-pagination').innerHTML = '';
                 return;
             }
 
-            fetch(`${API_URL}?action=toggleVendido&row=${selectedRowIndex}&pass=${encodeURIComponent(password)}`)
-                .then(response => response.json())
-                .then(res => {
-                    if (res.success) {
-                        closeModal();
-                        loadCatalog();
-                    } else {
-                        alert(res.message);
-                    }
-                })
-                .catch(err => alert('Erro na comunicação com o servidor.'));
+            const totalPages = Math.ceil(total / PAGE_SIZE) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const end = start + PAGE_SIZE;
+            const pageItems = filteredItems.slice(start, end);
+
+            pageItems.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.dataset.rowindex = item.rowIndex;
+                const isVendido = item.status === 'VENDIDO';
+                const statusColor = isVendido ? '#008000' : '#000000';
+                const photoUrl = getFirstPhotoUrl(item);
+
+                tr.innerHTML = `
+                    <td style="text-align: center; font-weight: bold; background: #e8e8e8;">${item.rowIndex}</td>
+                    <td style="text-align: center;">
+                        <div class="admin-thumb-wrapper">
+                            <img class="admin-thumb-img" src="${photoUrl}" alt="Capa" loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/44x44?text=Erro'">
+                            <img class="admin-thumb-preview" src="${photoUrl}" alt="Preview" onerror="this.onerror=null; this.src='https://via.placeholder.com/140x140?text=Erro'">
+                        </div>
+                    </td>
+                    <td>
+                        <select class="f-status" onchange="updateStatusColor(this)" style="font-weight:bold; color: ${statusColor};">
+                            <option value="" ${!isVendido ? 'selected' : ''}>Disponível</option>
+                            <option value="VENDIDO" ${isVendido ? 'selected' : ''}>VENDIDO</option>
+                        </select>
+                    </td>
+                    <td><input type="text" class="f-cat" value="${escapeHtml(item.categoria || '')}"></td>
+                    <td><input type="text" class="f-nome" value="${escapeHtml(item.nome || '')}"></td>
+                    <td><textarea class="f-desc" rows="2">${escapeHtml(item.descricao || '')}</textarea></td>
+                    <td><input type="number" step="0.01" class="f-preco" value="${item.preco || 0}"></td>
+                    <td><input type="text" class="f-link" value="${escapeHtml(item.linkRaw || '')}" title="Links separados por vírgula ou barra"></td>
+                    <td><input type="text" class="f-arq" value="${escapeHtml(item.arquivo || '')}"></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            renderAdminPagination(totalPages);
+        }
+
+        function renderAdminPagination(totalPages) {
+            const container = document.getElementById('admin-pagination');
+            container.innerHTML = '';
+            if (totalPages <= 1) return;
+            for (let p = 1; p <= totalPages; p++) {
+                const btn = document.createElement('button');
+                btn.className = `page-btn ${p === currentPage ? 'active' : ''}`;
+                btn.innerText = p;
+                btn.onclick = () => { saveCurrentPageEditsToMemory(); currentPage = p; renderAdminTable(); };
+                container.appendChild(btn);
+            }
+        }
+
+        function escapeHtml(text) { return String(text).replace(/"/g, '&quot;'); }
+
+        function fecharModalErro() {
+            document.getElementById('win98-error-modal').style.display = 'none';
+            location.reload(); 
+        }
+
+        function salvarTudo() {
+            saveCurrentPageEditsToMemory();
+            const pass = prompt("🔐 Digite a senha administrativa (senha_admin):");
+            if (!pass) return;
+
+            const payload = { password: pass, items: rawItems };
+            const btn = document.getElementById('btn-save-bottom');
+            const originalText = btn.innerText;
+            btn.innerText = "⏳ Salvando dados na planilha...";
+            btn.disabled = true;
+
+            fetch(API_URL + "?action=saveBatch", {
+                method: "POST",
+                body: JSON.stringify(payload)
+            })
+            .then(r => r.json())
+            .then(res => {
+                btn.innerText = originalText;
+                btn.disabled = false;
+                if (res.success) {
+                    // SUCESSO: Mostra a brincadeira do ERRO 404
+                    document.getElementById('win98-error-modal').style.display = 'flex';
+                } else {
+                    // SENHA ERRADA: Mostra a mensagem exata solicitada
+                    alert(res.message);
+                }
+            })
+            .catch(() => {
+                btn.innerText = originalText;
+                btn.disabled = false;
+                alert("Erro ao comunicar com a planilha Google.");
+            });
         }
     </script>
 </body>
