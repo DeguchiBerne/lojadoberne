@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo - Loja do Berne</title>
+    <title>Painel Admin - Loja do Berne</title>
     <style>
         :root {
             --primary: #2563eb;
@@ -12,164 +12,30 @@
             --text: #1e293b;
             --sold-overlay: rgba(239, 68, 68, 0.85);
         }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 20px;
-        }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto 30px auto;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 15px;
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        header { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto 30px auto; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; }
         h1 { margin: 0; color: #0f172a; font-size: 24px; }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-        .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            transition: transform 0.2s;
-        }
-        .card:hover { transform: translateY(-4px); }
-        .image-container {
-            width: 100%;
-            height: 220px;
-            background: #e2e8f0;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-        .image-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        /* Marca d'água de VENDIDO com transparência */
-        .sold-badge {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--sold-overlay);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            transform: rotate(-15deg);
-            z-index: 5;
-            box-shadow: 0 0 15px rgba(0,0,0,0.3);
-            pointer-events: none;
-        }
-        .card-content {
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            justify-content: space-between;
-        }
-        .category {
-            font-size: 11px;
-            text-transform: uppercase;
-            font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-        .title {
-            font-size: 16px;
-            font-weight: bold;
-            margin: 0 0 8px 0;
-            color: #1e293b;
-        }
-        .description {
-            font-size: 13px;
-            color: #64748b;
-            margin-bottom: 12px;
-            flex-grow: 1;
-        }
-        .footer-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-            border-top: 1px solid #f1f5f9;
-            padding-top: 10px;
-        }
-        .price {
-            font-size: 18px;
-            font-weight: bold;
-            color: #059669;
-        }
-        .admin-btn {
-            background-color: #475569;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: background 0.2s;
-        }
+        .back-link { font-size: 13px; color: #475569; text-decoration: none; font-weight: bold; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px; transition: all 0.2s; }
+        .back-link:hover { background-color: #e2e8f0; }
+        .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; flex-direction: column; position: relative; }
+        .image-container { width: 100%; height: 220px; background: #e2e8f0; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .image-container img { width: 100%; height: 100%; object-fit: cover; }
+        .sold-badge { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--sold-overlay); color: white; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; transform: rotate(-15deg); z-index: 5; pointer-events: none; }
+        .card-content { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
+        .category { font-size: 11px; text-transform: uppercase; font-weight: bold; color: var(--primary); margin-bottom: 5px; }
+        .title { font-size: 16px; font-weight: bold; margin: 0 0 8px 0; color: #1e293b; }
+        .description { font-size: 13px; color: #64748b; margin-bottom: 12px; flex-grow: 1; }
+        .footer-card { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px solid #f1f5f9; padding-top: 10px; }
+        .price { font-size: 18px; font-weight: bold; color: #059669; }
+        .admin-btn { background-color: #475569; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: background 0.2s; }
         .admin-btn:hover { background-color: #334155; }
         
-        /* Modal de Senha Administrativa */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-        }
-        .modal-content {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            width: 320px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            text-align: center;
-        }
-        .modal-content input {
-            width: 90%;
-            padding: 10px;
-            margin: 15px 0;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-        .modal-buttons {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-        }
-        .modal-buttons button {
-            flex: 1;
-            padding: 8px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-        }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 100; }
+        .modal-content { background: white; padding: 25px; border-radius: 12px; width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; }
+        .modal-content input { width: 90%; padding: 10px; margin: 15px 0; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
+        .modal-buttons { display: flex; justify-content: space-between; gap: 10px; }
+        .modal-buttons button { flex: 1; padding: 8px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-confirm { background: var(--primary); color: white; }
         .btn-cancel { background: #e2e8f0; color: #475569; }
     </style>
@@ -177,15 +43,14 @@
 <body>
 
     <header>
-        <h1>Catálogo de Anúncios - Loja do Berne</h1>
-        <div style="font-size: 14px; color: #64748b;">Painel com Acesso Administrativo Restrito</div>
+        <h1>Painel Administrativo - Loja do Berne</h1>
+        <a href="index.html" class="back-link">Ver Catálogo Público</a>
     </header>
 
     <div class="container" id="catalog-grid">
-        <p style="text-align: center; grid-column: 1 / -1;">Carregando anúncios...</p>
+        <p style="text-align: center; grid-column: 1 / -1;">Carregando painel...</p>
     </div>
 
-    <!-- Modal de Senha -->
     <div class="modal" id="adminModal">
         <div class="modal-content">
             <h3>Acesso Administrativo</h3>
@@ -199,6 +64,7 @@
     </div>
 
     <script>
+        const API_URL = "SUA_URL_DO_WEB_APP_AQUI";
         let selectedRowIndex = null;
 
         window.onload = function() {
@@ -206,12 +72,12 @@
         };
 
         function loadCatalog() {
-            google.script.run
-                .withSuccessHandler(renderCatalog)
-                .withFailureHandler(function(err) {
+            fetch(API_URL + "?action=getData")
+                .then(response => response.json())
+                .then(items => renderCatalog(items))
+                .catch(err => {
                     document.getElementById('catalog-grid').innerHTML = '<p style="color:red; text-align:center;">Erro ao carregar os dados.</p>';
-                })
-                .getCatalogData();
+                });
         }
 
         function renderCatalog(items) {
@@ -219,7 +85,7 @@
             grid.innerHTML = '';
 
             if (!items || items.length === 0) {
-                grid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Nenhum item encontrado na planilha.</p>';
+                grid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Nenhum item encontrado.</p>';
                 return;
             }
 
@@ -228,7 +94,6 @@
                 card.className = 'card';
 
                 let imgUrl = (item.links && item.links.length > 0) ? item.links[0] : 'https://via.placeholder.com/280x220?text=Sem+Foto';
-                
                 let soldOverlayHTML = item.vendido ? '<div class="sold-badge">Vendido</div>' : '';
 
                 card.innerHTML = `
@@ -273,19 +138,17 @@
                 return;
             }
 
-            google.script.run
-                .withSuccessHandler(function(response) {
-                    if (response.success) {
+            fetch(`${API_URL}?action=toggleVendido&row=${selectedRowIndex}&pass=${encodeURIComponent(password)}`)
+                .then(response => response.json())
+                .then(res => {
+                    if (res.success) {
                         closeModal();
-                        loadCatalog(); // Recarrega os anúncios atualizados
+                        loadCatalog();
                     } else {
-                        alert(response.message);
+                        alert(res.message);
                     }
                 })
-                .withFailureHandler(function(err) {
-                    alert('Erro na comunicação com o servidor.');
-                })
-                .toggleVendidoAdmin(selectedRowIndex, password);
+                .catch(err => alert('Erro na comunicação com o servidor.'));
         }
     </script>
 </body>
