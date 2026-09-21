@@ -2,22 +2,205 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Loja do Berne - GitHub Pages</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja do Berne - Catálogo</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --sold-overlay: rgba(239, 68, 68, 0.85);
+        }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 20px; 
+        }
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            max-width: 1200px; 
+            margin: 0 auto 30px auto; 
+            border-bottom: 2px solid #e2e8f0; 
+            padding-bottom: 15px; 
+        }
+        h1 { 
+            margin: 0; 
+            color: #0f172a; 
+            font-size: 24px; 
+        }
+        .admin-link { 
+            font-size: 13px; 
+            color: var(--primary); 
+            text-decoration: none; 
+            font-weight: bold; 
+            padding: 6px 12px; 
+            border: 1px solid var(--primary); 
+            border-radius: 6px; 
+            transition: all 0.2s; 
+        }
+        .admin-link:hover { 
+            background-color: var(--primary); 
+            color: white; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 20px; 
+        }
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 12px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            position: relative; 
+            transition: transform 0.2s;
+        }
+        .card:hover { transform: translateY(-4px); }
+        .image-container { 
+            width: 100%; 
+            height: 220px; 
+            background: #e2e8f0; 
+            position: relative; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+        }
+        .image-container img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+        }
+        .sold-badge { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: var(--sold-overlay); 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 32px; 
+            font-weight: bold; 
+            letter-spacing: 2px; 
+            text-transform: uppercase; 
+            transform: rotate(-15deg); 
+            z-index: 5; 
+            pointer-events: none; 
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        }
+        .card-content { 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            flex-grow: 1; 
+            justify-content: space-between; 
+        }
+        .category { 
+            font-size: 11px; 
+            text-transform: uppercase; 
+            font-weight: bold; 
+            color: var(--primary); 
+            margin-bottom: 5px; 
+        }
+        .title { 
+            font-size: 16px; 
+            font-weight: bold; 
+            margin: 0 0 8px 0; 
+            color: #1e293b; 
+        }
+        .description { 
+            font-size: 13px; 
+            color: #64748b; 
+            margin-bottom: 12px; 
+            flex-grow: 1; 
+        }
+        .footer-card { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-top: 10px; 
+            border-top: 1px solid #f1f5f9; 
+            padding-top: 10px; 
+        }
+        .price { 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: #059669; 
+        }
+    </style>
 </head>
 <body>
-    <h1>Catálogo</h1>
-    <div id="catalog-grid">Carregando...</div>
+
+    <header>
+        <h1>Loja do Berne - Catálogo</h1>
+        <a href="admin.html" class="admin-link">Área Administrativa</a>
+    </header>
+
+    <div class="container" id="catalog-grid">
+        <p style="text-align: center; grid-column: 1 / -1;">Carregando anúncios...</p>
+    </div>
 
     <script>
         // Substitua pela URL do seu Web App implantado no Google Apps Script
-        const WEB_APP_URL = "SUA_URL_DO_WEB_APP_AQUI";
+        const API_URL = "https://script.google.com/macros/s/AKfycbwv8m5xK7gjdRR6ZWyxqUBrz0fYYLn0pBvTbAjweUuDQl5y7qfk0vZltXQEgTLFUi-unA/exec";
 
-        fetch(WEB_APP_URL + "?action=getData")
-            .then(response => response.json())
-            .then(items => {
-                // Aqui você renderiza os itens no seu HTML do GitHub
-                console.log(items);
+        window.onload = function() {
+            fetch(API_URL + "?action=getData")
+                .then(response => response.json())
+                .then(items => renderCatalog(items))
+                .catch(err => {
+                    document.getElementById('catalog-grid').innerHTML = '<p style="color:red; text-align:center;">Erro ao carregar os anúncios. Verifique a URL da API.</p>';
+                });
+        };
+
+        function renderCatalog(items) {
+            const grid = document.getElementById('catalog-grid');
+            grid.innerHTML = '';
+
+            if (!items || items.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Nenhum item cadastrado.</p>';
+                return;
+            }
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+
+                // Pega a primeira foto da lista de links se houver
+                let imgUrl = (item.links && item.links.length > 0) ? item.links[0] : 'https://via.placeholder.com/280x220?text=Sem+Foto';
+                let soldOverlayHTML = item.vendido ? '<div class="sold-badge">Vendido</div>' : '';
+
+                card.innerHTML = `
+                    <div class="image-container">
+                        ${soldOverlayHTML}
+                        <img src="${imgUrl}" alt="${item.nome}" loading="lazy" onerror="this.src='https://via.placeholder.com/280x220?text=Erro+Foto'">
+                    </div>
+                    <div class="card-content">
+                        <div>
+                            <div class="category">${item.categoria || 'Geral'}</div>
+                            <h2 class="title">${item.nome}</h2>
+                            <div class="description">${item.descricao || 'Sem descrição.'}</div>
+                        </div>
+                        <div class="footer-card">
+                            <div class="price">R$ ${item.preco ? Number(item.preco).toFixed(2).replace('.', ',') : '0,00'}</div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
             });
+        }
     </script>
 </body>
 </html>
