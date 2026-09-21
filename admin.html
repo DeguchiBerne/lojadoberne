@@ -16,16 +16,24 @@
         <div class="content-area">
 
             <header style="margin-bottom: 10px;">
-                <h1>PAINEL DE INVENTÁRIO (MODO PLANILHA)</h1>
+                <h1>PAINEL DE INVENTÁRIO (PLANILHA)</h1>
                 <div class="controls">
                     <a href="index.html" class="btn-retro">⬅️ Voltar ao Catálogo</a>
-                    <button class="btn-retro" style="background:#28a745; color:white;" onclick="salvarTudo()">💾 SALVAR ALTERAÇÕES NA PLANILHA</button>
+                    <button class="btn-retro" style="background:#28a745; color:white;" onclick="salvarTudo()">💾 SALVAR ALTERAÇÕES</button>
                 </div>
             </header>
 
-            <p style="font-size: 12px; color: #555; margin: 5px 0;">
-                * Edite os campos diretamente na tabela abaixo. Na coluna <strong>Status</strong>, deixe em branco para <em>Disponível</em> ou escolha <em>VENDIDO</em>.
-            </p>
+            <div class="admin-toolbar">
+                <label><strong>🔍 Buscar:</strong></label>
+                <input type="text" id="admin-search" placeholder="Filtrar por nome, descrição, arquivo..." oninput="onFilterChange()" style="width: 250px;">
+
+                <label style="margin-left: 10px;"><strong>📂 Categoria:</strong></label>
+                <select id="admin-cat-filter" onchange="onFilterChange()" style="min-width: 150px;">
+                    <option value="">Todas as Categorias</option>
+                </select>
+
+                <span id="admin-count-info" style="margin-left: auto; font-size: 11px; font-weight: bold;">Carregando...</span>
+            </div>
 
             <div class="admin-table-container">
                 <table class="win98-table" id="inventory-table">
@@ -33,25 +41,27 @@
                         <tr>
                             <th style="width: 40px;">Linha</th>
                             <th style="width: 90px;">Status</th>
-                            <th style="width: 140px;">Categoria</th>
-                            <th style="width: 200px;">Nome do Item</th>
-                            <th style="width: 250px;">Descrição</th>
-                            <th style="width: 80px;">Preço (R$)</th>
+                            <th style="width: 130px;">Categoria</th>
+                            <th style="width: 180px;">Nome do Item</th>
+                            <th style="width: 240px;">Descrição</th>
+                            <th style="width: 75px;">Preço</th>
                             <th style="width: 180px;">Links das Fotos</th>
-                            <th style="width: 140px;">Nome do Arquivo</th>
+                            <th style="width: 130px;">Arquivo</th>
                         </tr>
                     </thead>
                     <tbody id="table-body">
                         <tr>
-                            <td colspan="8" style="text-align: center; padding: 20px;">Carregando registros da planilha...</td>
+                            <td colspan="8" style="text-align: center; padding: 20px;">Carregando dados...</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <div style="text-align: right; margin-top: 10px;">
+            <div class="pagination" id="admin-pagination"></div>
+
+            <div style="text-align: right; margin-top: 15px;">
                 <button class="btn-retro" style="background:#28a745; color:white; padding: 10px 20px; font-size: 14px;" onclick="salvarTudo()">
-                    💾 SALVAR TODAS AS ALTERAÇÕES
+                    💾 SALVAR TODAS AS ALTERAÇÕES NA PLANILHA
                 </button>
             </div>
 
@@ -60,25 +70,96 @@
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwv8m5xK7gjdRR6ZWyxqUBrz0fYYLn0pBvTbAjweUuDQl5y7qfk0vZltXQEgTLFUi-unA/exec";
-        let loadedItems = [];
+        
+        let rawItems = [];
+        let filteredItems = [];
+        let currentPage = 1;
+        const PAGE_SIZE = 20;
 
         window.onload = function() {
             fetch(API_URL + "?action=getData")
                 .then(r => r.json())
                 .then(items => {
-                    loadedItems = items;
-                    renderTable(items);
+                    rawItems = items;
+                    populateCategoryDropdown(items);
+                    onFilterChange();
                 })
                 .catch(() => {
-                    document.getElementById('table-body').innerHTML = '<tr><td colspan="8" style="color:red; text-align:center;">Erro ao carregar os dados.</td></tr>';
+                    document.getElementById('table-body').innerHTML = '<tr><td colspan="8" style="color:red; text-align:center;">Erro ao carregar os dados da planilha.</td></tr>';
                 });
         };
 
-        function renderTable(items) {
+        function populateCategoryDropdown(items) {
+            const select = document.getElementById('admin-cat-filter');
+            const cats = [...new Set(items.map(i => i.categoria || 'Geral'))].sort();
+            cats.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.innerText = c;
+                select.appendChild(opt);
+            });
+        }
+
+        function onFilterChange() {
+            saveCurrentPageEditsToMemory();
+
+            const term = document.getElementById('admin-search').value.toLowerCase().trim();
+            const cat = document.getElementById('admin-cat-filter').value;
+
+            filteredItems = rawItems.filter(item => {
+                const matchCat = !cat || (item.categoria || 'Geral') === cat;
+                const matchTerm = !term || 
+                    String(item.nome || '').toLowerCase().includes(term) ||
+                    String(item.descricao || '').toLowerCase().includes(term) ||
+                    String(item.arquivo || '').toLowerCase().includes(term) ||
+                    String(item.rowIndex).includes(term);
+                return matchCat && matchTerm;
+            });
+
+            currentPage = 1;
+            renderAdminTable();
+        }
+
+        function saveCurrentPageEditsToMemory() {
+            const rows = document.querySelectorAll('#table-body tr');
+            rows.forEach(tr => {
+                const rIndex = Number(tr.dataset.rowindex);
+                if (!rIndex) return;
+
+                const item = rawItems.find(i => i.rowIndex === rIndex);
+                if (item) {
+                    item.status = tr.querySelector('.f-status').value;
+                    item.categoria = tr.querySelector('.f-cat').value;
+                    item.nome = tr.querySelector('.f-nome').value;
+                    item.descricao = tr.querySelector('.f-desc').value;
+                    item.preco = tr.querySelector('.f-preco').value;
+                    item.linkRaw = tr.querySelector('.f-link').value;
+                    item.arquivo = tr.querySelector('.f-arq').value;
+                }
+            });
+        }
+
+        function renderAdminTable() {
             const tbody = document.getElementById('table-body');
             tbody.innerHTML = '';
 
-            items.forEach((item, idx) => {
+            const total = filteredItems.length;
+            document.getElementById('admin-count-info').innerText = `Total: ${total} item(ns)`;
+
+            if (total === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:15px;">Nenhum item correspondente ao filtro.</td></tr>';
+                document.getElementById('admin-pagination').innerHTML = '';
+                return;
+            }
+
+            const totalPages = Math.ceil(total / PAGE_SIZE) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const end = start + PAGE_SIZE;
+            const pageItems = filteredItems.slice(start, end);
+
+            pageItems.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.dataset.rowindex = item.rowIndex;
 
@@ -99,6 +180,26 @@
                 `;
                 tbody.appendChild(tr);
             });
+
+            renderAdminPagination(totalPages);
+        }
+
+        function renderAdminPagination(totalPages) {
+            const container = document.getElementById('admin-pagination');
+            container.innerHTML = '';
+            if (totalPages <= 1) return;
+
+            for (let p = 1; p <= totalPages; p++) {
+                const btn = document.createElement('button');
+                btn.className = `page-btn ${p === currentPage ? 'active' : ''}`;
+                btn.innerText = p;
+                btn.onclick = () => {
+                    saveCurrentPageEditsToMemory();
+                    currentPage = p;
+                    renderAdminTable();
+                };
+                container.appendChild(btn);
+            }
         }
 
         function escapeHtml(text) {
@@ -106,34 +207,18 @@
         }
 
         function salvarTudo() {
+            saveCurrentPageEditsToMemory();
+
             const pass = prompt("🔐 Digite a senha administrativa (senha_admin):");
             if (!pass) return;
 
-            const rows = document.querySelectorAll('#table-body tr');
-            const itemsToSave = [];
-
-            rows.forEach(tr => {
-                itemsToSave.push({
-                    rowIndex: tr.dataset.rowindex,
-                    status: tr.querySelector('.f-status').value,
-                    categoria: tr.querySelector('.f-cat').value,
-                    nome: tr.querySelector('.f-nome').value,
-                    descricao: tr.querySelector('.f-desc').value,
-                    preco: tr.querySelector('.f-preco').value,
-                    linkRaw: tr.querySelector('.f-link').value,
-                    arquivo: tr.querySelector('.f-arq').value
-                });
-            });
-
             const payload = {
                 password: pass,
-                items: itemsToSave
+                items: rawItems
             };
 
-            const btn = event.target;
-            const originalText = btn.innerText;
-            btn.innerText = "Salvando...";
-            btn.disabled = true;
+            const btns = document.querySelectorAll('button');
+            btns.forEach(b => b.disabled = true);
 
             fetch(API_URL + "?action=saveBatch", {
                 method: "POST",
@@ -141,19 +226,17 @@
             })
             .then(r => r.json())
             .then(res => {
-                btn.innerText = originalText;
-                btn.disabled = false;
+                btns.forEach(b => b.disabled = false);
                 if (res.success) {
-                    alert("Sucesso: " + res.message);
+                    alert("✓ " + res.message);
                     location.reload();
                 } else {
-                    alert("Erro: " + res.message);
+                    alert("❌ " + res.message);
                 }
             })
-            .catch(err => {
-                btn.innerText = originalText;
-                btn.disabled = false;
-                alert("Erro ao comunicar com a planilha.");
+            .catch(() => {
+                btns.forEach(b => b.disabled = false);
+                alert("Erro ao comunicar com a planilha Google.");
             });
         }
     </script>

@@ -98,7 +98,6 @@ h1 { margin: 0; font-size: 32px; letter-spacing: 2px; }
 .theme-win98 h1 { font-family: "Impact", sans-serif; color: #000080; text-shadow: 2px 2px #c0c0c0; }
 .theme-neon h1 { font-family: "Courier New", monospace; color: #00ffcc; text-shadow: 2px 2px #ff007f; }
 
-/* Contador de visitas maior ao lado do título */
 .counter-badge {
     display: inline-flex;
     align-items: center;
@@ -120,14 +119,13 @@ h1 { margin: 0; font-size: 32px; letter-spacing: 2px; }
     box-shadow: 0 0 10px #ffee00;
 }
 
+/* LINK SECRETO NOS DOIS PONTOS SEM CURSOR DE MÃO */
 .secret-colon {
-    cursor: pointer;
-    text-decoration: none;
-    color: inherit;
+    cursor: default !important;
+    text-decoration: none !important;
+    color: inherit !important;
     user-select: none;
-}
-.secret-colon:hover {
-    color: #ff0000;
+    outline: none;
 }
 
 .btn-retro {
@@ -139,11 +137,12 @@ h1 { margin: 0; font-size: 32px; letter-spacing: 2px; }
     font-weight: bold;
     font-size: 13px;
     cursor: pointer;
+    text-decoration: none;
 }
 .theme-win98 .btn-retro { color: #000; }
 .theme-neon .btn-retro { color: #fff; box-shadow: 2px 2px 0px #00ffcc; }
 
-/* Guia Multi-Categoria */
+/* Guia Categorias */
 .cat-guide {
     display: flex;
     flex-wrap: wrap;
@@ -194,9 +193,7 @@ h1 { margin: 0; font-size: 32px; letter-spacing: 2px; }
 .theme-win98 .section-title { color: #000080; border-bottom: 2px solid #c0c0c0; }
 .theme-neon .section-title { color: #ffee00; border-bottom: 1px solid #00ffcc; }
 
-/* =========================================
-   CARDS DE ANÚNCIO COM TAMANHO IDÊNTICO E HOVER
-   ========================================= */
+/* Grid e Cards de Tamanho Idêntico */
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -206,7 +203,7 @@ h1 { margin: 0; font-size: 32px; letter-spacing: 2px; }
 .card {
     background: var(--card-bg);
     padding: 10px;
-    height: 340px; /* Altura idêntica para todos os cards no preview */
+    height: 340px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -330,16 +327,17 @@ h1 { margin: 0; font-size: 32px; letter-spacing: 2px; }
 .theme-neon .cart-btn.added { background: #00ff66; color: #000; }
 .cart-btn.disabled { background: #777 !important; color: #aaa !important; border-color: #555 !important; cursor: not-allowed; }
 
-/* Paginação (Máx 12 itens por página) */
+/* Paginação */
 .pagination {
     display: flex;
     justify-content: center;
-    gap: 8px;
-    margin: 25px 0 10px 0;
+    gap: 6px;
+    margin: 20px 0;
+    flex-wrap: wrap;
 }
 .page-btn {
-    padding: 6px 12px;
-    font-size: 12px;
+    padding: 5px 10px;
+    font-size: 11px;
     font-weight: bold;
     cursor: pointer;
 }
@@ -348,7 +346,7 @@ h1 { margin: 0; font-size: 32px; letter-spacing: 2px; }
 .theme-neon .page-btn { background: #15152b; color: #ffee00; border: 1px solid #00ffcc; }
 .theme-neon .page-btn.active { background: #00ffcc; color: #000; }
 
-/* Modal de Detalhes com Galeria */
+/* Modal */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -422,8 +420,8 @@ h1 { margin: 0; font-size: 32px; letter-spacing: 2px; }
 }
 .gallery-thumb.active { border-color: #ff0000; }
 
-/* Carrinho Flutuante */
-.floating-cart { position: fixed; bottom: 0; right: 20px; width: 320px; z-index: 2000; transition: transform 0.3s ease-in-out; }
+/* Carrinho Flutuante com Botão X */
+.floating-cart { position: fixed; bottom: 0; right: 20px; width: 330px; z-index: 2000; transition: transform 0.3s ease-in-out; }
 .floating-cart.minimized { transform: translateY(calc(100% - 35px)); }
 .theme-win98 .floating-cart { background: #c0c0c0; border: 2px solid; border-color: #dfdfdf #080808 #080808 #dfdfdf; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
 .theme-neon .floating-cart { background: #15152b; border: 3px solid #00ffff; box-shadow: 0 0 15px #00ffff; }
@@ -432,11 +430,30 @@ h1 { margin: 0; font-size: 32px; letter-spacing: 2px; }
 .theme-win98 .fc-header { background: #000080; color: #fff; }
 .theme-neon .fc-header { background: #ff007f; color: #fff; border-bottom: 2px solid #00ffff; }
 
-.fc-body { padding: 10px; max-height: 200px; overflow-y: auto; font-size: 11px; }
-.theme-win98 .fc-body { background: #fff; color: #000; border: 2px inset #dfdfdf; margin: 5px; }
+.fc-body { padding: 8px; max-height: 200px; overflow-y: auto; font-size: 11px; }
+.theme-win98 .fc-body { background: #fff; color: #000; border: 2px inset #dfdfdf; margin: 4px; }
 .theme-neon .fc-body { background: #fff; color: #000; }
 
-.fc-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding: 4px 0; }
+.fc-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed #ccc;
+    padding: 4px 0;
+    gap: 6px;
+}
+.fc-item-remove {
+    background: #ff4d4d;
+    color: white;
+    border: 1px solid #800000;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 10px;
+    padding: 1px 5px;
+    line-height: 1;
+}
+.fc-item-remove:hover { background: #cc0000; }
+
 .fc-footer { padding: 10px; text-align: center; }
 .theme-win98 .fc-footer { border-top: 2px solid #dfdfdf; color: #000;}
 .theme-neon .fc-footer { border-top: 2px solid #00ffff; color: #00ffcc; }
@@ -446,13 +463,29 @@ h1 { margin: 0; font-size: 32px; letter-spacing: 2px; }
 .theme-neon .wpp-btn { background: #25d366; color: #fff; border: 2px solid #fff; }
 .wpp-btn.disabled { opacity: 0.5; pointer-events: none; }
 
-/* Tabela da Planilha Admin Win98 */
+/* Admin Toolbar e Tabela */
+.admin-toolbar {
+    display: flex;
+    gap: 10px;
+    background: #d4d0c8;
+    padding: 8px;
+    border: 2px inset #fff;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.admin-toolbar input, .admin-toolbar select {
+    padding: 5px;
+    font-family: inherit;
+    font-size: 12px;
+    border: 1px solid #7f9db9;
+}
 .admin-table-container {
     overflow-x: auto;
     background: #fff;
     border: 2px inset #fff;
-    margin: 15px 0;
-    max-height: 65vh;
+    margin: 10px 0;
+    max-height: 60vh;
 }
 .win98-table {
     width: 100%;
@@ -471,7 +504,7 @@ h1 { margin: 0; font-size: 32px; letter-spacing: 2px; }
 }
 .win98-table td {
     border: 1px solid #c0c0c0;
-    padding: 4px;
+    padding: 3px;
 }
 .win98-table input, .win98-table textarea, .win98-table select {
     width: 100%;
@@ -479,5 +512,5 @@ h1 { margin: 0; font-size: 32px; letter-spacing: 2px; }
     font-size: 11px;
     font-family: inherit;
     box-sizing: border-box;
-    padding: 2px;
+    padding: 3px;
 }

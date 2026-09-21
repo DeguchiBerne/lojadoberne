@@ -16,15 +16,14 @@
         <div class="content-area">
             
             <div class="marquee-box">
-                <marquee scrollamount="4">Bem-vindo à Loja do Berne! Clique em qualquer item para ver todas as fotos e detalhes. Feche o pedido via WhatsApp!</marquee>
+                <marquee scrollamount="4">Bem-vindo à Loja do Berne! Clique em qualquer item para abrir fotos detalhadas. Feche seu pacote via WhatsApp!</marquee>
             </div>
 
             <header>
                 <div class="brand-wrapper">
                     <h1>LOJA DO BERNE</h1>
-                    <!-- Contador de Visitas Maior com o link secreto nos ":" -->
                     <div class="counter-badge">
-                        VISITAS<a href="admin.html" class="secret-colon" title="...">:</a> <span id="visitor-count">000000</span>
+                        VISITAS<a href="admin.html" class="secret-colon">:</a> <span id="visitor-count">000000</span>
                     </div>
                 </div>
                 <div class="controls">
@@ -32,31 +31,24 @@
                 </div>
             </header>
 
-            <!-- Painel de Seleção Múltipla de Categorias -->
-            <div class="section-title">📂 Filtrar por Categorias (Múltipla Seleção)</div>
-            <div class="cat-guide" id="category-guide">
-                <!-- Preenchido via JavaScript -->
-            </div>
+            <div class="section-title">📂 Categorias (Múltipla Seleção)</div>
+            <div class="cat-guide" id="category-guide"></div>
 
-            <!-- Destaques Aleatórios na Tela Inicial -->
             <div id="home-featured-section">
-                <div class="section-title">⭐ Destaques Aleatórios por Categoria</div>
+                <div class="section-title">⭐ Destaques Aleatórios</div>
                 <div class="grid" id="featured-grid"></div>
             </div>
 
-            <!-- Catálogo Geral Paginado (Máx 12 itens) -->
-            <div class="section-title" id="main-catalog-title">📦 Catálogo de Itens</div>
+            <div class="section-title" id="main-catalog-title">📦 Catálogo Geral</div>
             <div class="grid" id="catalog-grid">
-                <p style="text-align: center; grid-column: 1 / -1;">Carregando anúncios...</p>
+                <p style="text-align: center; grid-column: 1 / -1;">Carregando banco de dados...</p>
             </div>
 
-            <!-- Paginação -->
             <div class="pagination" id="pagination-controls"></div>
 
         </div>
     </div>
 
-    <!-- Modal com Detalhes, Galeria de Fotos e Descrição -->
     <div class="modal-overlay" id="product-modal">
         <div class="modal-window">
             <div class="modal-titlebar">
@@ -73,15 +65,12 @@
                     <h3 style="margin: 6px 0;" id="modal-item-name">Nome do Item</h3>
                     <div class="price" id="modal-item-price" style="display:inline-block;">R$ 0,00</div>
                 </div>
-                <div style="font-size: 12px; line-height: 1.4; border-top: 1px dotted #888; padding-top: 8px; margin-bottom: 12px;" id="modal-item-desc">
-                    Descrição...
-                </div>
-                <button id="modal-cart-btn" class="cart-btn" onclick="">🛒 Adicionar ao Carrinho</button>
+                <div style="font-size: 12px; line-height: 1.4; border-top: 1px dotted #888; padding-top: 8px; margin-bottom: 12px;" id="modal-item-desc"></div>
+                <button id="modal-cart-btn" class="cart-btn">🛒 Adicionar ao Carrinho</button>
             </div>
         </div>
     </div>
 
-    <!-- Carrinho Flutuante Independente -->
     <div class="floating-cart minimized" id="floating-cart">
         <div class="fc-header" onclick="toggleCartMinimize()">
             <span id="fc-title">🛒 Carrinho (0) - R$ 0,00</span>
@@ -100,7 +89,7 @@
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwv8m5xK7gjdRR6ZWyxqUBrz0fYYLn0pBvTbAjweUuDQl5y7qfk0vZltXQEgTLFUi-unA/exec";
-        const WHATSAPP_NUMBER = "5541999999999"; // Substitua pelo seu WhatsApp com DDD
+        const WHATSAPP_NUMBER = "5541999999999";
 
         let allProducts = [];
         let cart = [];
@@ -113,7 +102,6 @@
             let savedTheme = localStorage.getItem('berne_theme');
             if (savedTheme) document.getElementById('body-tag').className = savedTheme;
 
-            // Contador de visitas persistente
             let visitas = localStorage.getItem('berne_visitas') || 1350;
             if (!sessionStorage.getItem('visited')) {
                 visitas++;
@@ -131,7 +119,7 @@
                     renderFilteredCatalog();
                 })
                 .catch(() => {
-                    document.getElementById('catalog-grid').innerHTML = '<p style="color:red; text-align:center;">Falha de Conexão com o Servidor.</p>';
+                    document.getElementById('catalog-grid').innerHTML = '<p style="color:red; text-align:center;">Falha de conexão com o servidor.</p>';
                 });
         };
 
@@ -206,7 +194,7 @@
             const categories = [...new Set(items.map(i => i.categoria || 'Geral'))];
 
             categories.forEach(cat => {
-                const catItems = items.filter(i => (i.categoria || 'Geral') === cat && !i.vendido);
+                const catItems = items.filter(i => (i.categoria || 'Geral') === cat && i.status !== "VENDIDO");
                 if (catItems.length === 0) return;
                 const randomItem = catItems[Math.floor(Math.random() * catItems.length)];
                 grid.appendChild(createCardElement(randomItem));
@@ -260,7 +248,6 @@
             const card = document.createElement('div');
             card.className = 'card';
             card.onclick = (e) => {
-                // Evita abrir modal se clicou no botão do carrinho
                 if (e.target.tagName !== 'BUTTON') openModal(item);
             };
 
@@ -294,7 +281,6 @@
             return card;
         }
 
-        // Modal de Fotos & Detalhes
         function openModal(item) {
             const modal = document.getElementById('product-modal');
             document.getElementById('modal-item-title').innerText = `Visualizador: ${item.nome}`;
@@ -344,7 +330,6 @@
             document.getElementById('product-modal').style.display = 'none';
         }
 
-        // Gestão do Carrinho
         function toggleCart(rowIndex) {
             const idx = cart.findIndex(i => i.rowIndex === rowIndex);
             if (idx > -1) {
@@ -354,7 +339,18 @@
                 if (p && p.status !== "VENDIDO") cart.push(p);
             }
             renderFilteredCatalog();
+            renderFeaturedItems(allProducts);
             updateCartUI();
+        }
+
+        function removerDoCarrinho(rowIndex) {
+            const idx = cart.findIndex(i => i.rowIndex === rowIndex);
+            if (idx > -1) {
+                cart.splice(idx, 1);
+                renderFilteredCatalog();
+                renderFeaturedItems(allProducts);
+                updateCartUI();
+            }
         }
 
         function updateCartUI() {
@@ -380,7 +376,8 @@
             cart.forEach(item => {
                 html += `
                     <div class="fc-item">
-                        <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px;">• ${item.nome}</span>
+                        <button class="fc-item-remove" onclick="removerDoCarrinho(${item.rowIndex})" title="Remover item">X</button>
+                        <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:170px;">${item.nome}</span>
                         <span style="font-weight:bold;">R$ ${Number(item.preco).toFixed(2).replace('.', ',')}</span>
                     </div>`;
             });
