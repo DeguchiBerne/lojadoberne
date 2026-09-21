@@ -16,9 +16,10 @@
         <div class="content-area">
             
             <div class="marquee-box">
-                <marquee scrollamount="4">Bem-vindo à Loja do Berne! Clique em qualquer item para abrir fotos detalhadas. Feche seu pacote via WhatsApp!</marquee>
+                <marquee scrollamount="4">Bem-vindo à Loja do Berne! Clique em qualquer item para ver fotos detalhadas. Monte seu carrinho e envie para o WhatsApp!</marquee>
             </div>
 
+            <!-- Header Centralizado com LOJA DO BERNE em Destaque Total -->
             <header>
                 <div class="brand-wrapper">
                     <h1>LOJA DO BERNE</h1>
@@ -31,24 +32,28 @@
                 </div>
             </header>
 
-            <div class="section-title">📂 Categorias (Múltipla Seleção)</div>
+            <!-- Categorias -->
+            <div class="section-title">📂 Categorias</div>
             <div class="cat-guide" id="category-guide"></div>
 
+            <!-- Destaques (12 aleatórios antes de selecionar categorias) -->
             <div id="home-featured-section">
-                <div class="section-title">⭐ Destaques Aleatórios</div>
+                <div class="section-title">⭐ Destaques</div>
                 <div class="grid" id="featured-grid"></div>
             </div>
 
-            <div class="section-title" id="main-catalog-title">📦 Catálogo Geral</div>
-            <div class="grid" id="catalog-grid">
+            <!-- Catálogo Geral Paginado (Após Seleção, Máximo 12 por página) -->
+            <div class="section-title" id="main-catalog-title" style="display: none;">📦 Catálogo</div>
+            <div class="grid" id="catalog-grid" style="display: none;">
                 <p style="text-align: center; grid-column: 1 / -1;">Carregando banco de dados...</p>
             </div>
 
-            <div class="pagination" id="pagination-controls"></div>
+            <div class="pagination" id="pagination-controls" style="display: none;"></div>
 
         </div>
     </div>
 
+    <!-- Modal com Galeria -->
     <div class="modal-overlay" id="product-modal">
         <div class="modal-window">
             <div class="modal-titlebar">
@@ -71,6 +76,7 @@
         </div>
     </div>
 
+    <!-- Carrinho Flutuante -->
     <div class="floating-cart minimized" id="floating-cart">
         <div class="fc-header" onclick="toggleCartMinimize()">
             <span id="fc-title">🛒 Carrinho (0) - R$ 0,00</span>
@@ -115,11 +121,10 @@
                 .then(items => {
                     allProducts = items;
                     buildCategoryGuide(items);
-                    renderFeaturedItems(items);
-                    renderFilteredCatalog();
+                    renderRandomFeatured(items);
                 })
                 .catch(() => {
-                    document.getElementById('catalog-grid').innerHTML = '<p style="color:red; text-align:center;">Falha de conexão com o servidor.</p>';
+                    document.getElementById('featured-grid').innerHTML = '<p style="color:red; text-align:center;">Falha de conexão com o servidor.</p>';
                 });
         };
 
@@ -136,11 +141,11 @@
             const btnAll = document.createElement('div');
             btnAll.className = 'cat-checkbox-btn selected';
             btnAll.id = 'cat-all-btn';
-            btnAll.innerText = '✓ [ TODAS AS CATEGORIAS ]';
+            btnAll.innerText = '✓ [ TODAS ]';
             btnAll.onclick = () => resetCategories();
             guide.appendChild(btnAll);
 
-            const categories = [...new Set(items.map(i => i.categoria || 'Geral'))];
+            const categories = [...new Set(items.map(i => i.categoria || 'Geral'))].sort();
             categories.forEach(cat => {
                 const btn = document.createElement('div');
                 btn.className = 'cat-checkbox-btn';
@@ -158,10 +163,14 @@
                 if (b.id !== 'cat-all-btn') b.innerText = `+ ${b.dataset.cat}`;
             });
             document.getElementById('cat-all-btn').classList.add('selected');
-            document.getElementById('cat-all-btn').innerText = '✓ [ TODAS AS CATEGORIAS ]';
+            document.getElementById('cat-all-btn').innerText = '✓ [ TODAS ]';
+
+            // Mostra apenas os 12 aleatórios de Destaques
             document.getElementById('home-featured-section').style.display = 'block';
-            currentPage = 1;
-            renderFilteredCatalog();
+            document.getElementById('main-catalog-title').style.display = 'none';
+            document.getElementById('catalog-grid').style.display = 'none';
+            document.getElementById('pagination-controls').style.display = 'none';
+            renderRandomFeatured(allProducts);
         }
 
         function toggleCategory(cat, btn) {
@@ -183,30 +192,32 @@
                 return;
             }
 
+            // Oculta Destaques e exibe o Catálogo Paginado da Seleção
             document.getElementById('home-featured-section').style.display = 'none';
+            document.getElementById('main-catalog-title').style.display = 'block';
+            document.getElementById('catalog-grid').style.display = 'grid';
+            document.getElementById('pagination-controls').style.display = 'flex';
+
             currentPage = 1;
             renderFilteredCatalog();
         }
 
-        function renderFeaturedItems(items) {
+        // Sorteia exatamente 12 itens aleatórios disponíveis
+        function renderRandomFeatured(items) {
             const grid = document.getElementById('featured-grid');
             grid.innerHTML = '';
-            const categories = [...new Set(items.map(i => i.categoria || 'Geral'))];
+            
+            const available = items.filter(i => i.status !== "VENDIDO");
+            const shuffled = [...available].sort(() => 0.5 - Math.random());
+            const selected12 = shuffled.slice(0, 12);
 
-            categories.forEach(cat => {
-                const catItems = items.filter(i => (i.categoria || 'Geral') === cat && i.status !== "VENDIDO");
-                if (catItems.length === 0) return;
-                const randomItem = catItems[Math.floor(Math.random() * catItems.length)];
-                grid.appendChild(createCardElement(randomItem));
+            selected12.forEach(item => {
+                grid.appendChild(createCardElement(item));
             });
         }
 
         function renderFilteredCatalog() {
-            let filtered = allProducts;
-            if (selectedCategories.size > 0) {
-                filtered = allProducts.filter(i => selectedCategories.has(i.categoria || 'Geral'));
-            }
-
+            const filtered = allProducts.filter(i => selectedCategories.has(i.categoria || 'Geral'));
             const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1;
             if (currentPage > totalPages) currentPage = 1;
 
@@ -338,8 +349,17 @@
                 const p = allProducts.find(x => x.rowIndex === rowIndex);
                 if (p && p.status !== "VENDIDO") cart.push(p);
             }
-            renderFilteredCatalog();
-            renderFeaturedItems(allProducts);
+
+            if (selectedCategories.size === 0) {
+                // Atualiza visual dos cards de Destaques
+                const featuredCards = document.querySelectorAll('#featured-grid .card');
+                featuredCards.forEach(c => {
+                    // Re-render simples
+                });
+                renderRandomFeatured(allProducts);
+            } else {
+                renderFilteredCatalog();
+            }
             updateCartUI();
         }
 
@@ -347,8 +367,11 @@
             const idx = cart.findIndex(i => i.rowIndex === rowIndex);
             if (idx > -1) {
                 cart.splice(idx, 1);
-                renderFilteredCatalog();
-                renderFeaturedItems(allProducts);
+                if (selectedCategories.size === 0) {
+                    renderRandomFeatured(allProducts);
+                } else {
+                    renderFilteredCatalog();
+                }
                 updateCartUI();
             }
         }

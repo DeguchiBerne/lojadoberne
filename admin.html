@@ -16,13 +16,14 @@
         <div class="content-area">
 
             <header style="margin-bottom: 10px;">
-                <h1>PAINEL DE INVENTÁRIO (PLANILHA)</h1>
+                <h1 style="font-size: 32px;">PAINEL DE INVENTÁRIO (PLANILHA)</h1>
                 <div class="controls">
                     <a href="index.html" class="btn-retro">⬅️ Voltar ao Catálogo</a>
                     <button class="btn-retro" style="background:#28a745; color:white;" onclick="salvarTudo()">💾 SALVAR ALTERAÇÕES</button>
                 </div>
             </header>
 
+            <!-- Barra de Ferramentas -->
             <div class="admin-toolbar">
                 <label><strong>🔍 Buscar:</strong></label>
                 <input type="text" id="admin-search" placeholder="Filtrar por nome, descrição, arquivo..." oninput="onFilterChange()" style="width: 250px;">
@@ -35,18 +36,19 @@
                 <span id="admin-count-info" style="margin-left: auto; font-size: 11px; font-weight: bold;">Carregando...</span>
             </div>
 
+            <!-- Tabela com Cabeçalhos Redimensionáveis -->
             <div class="admin-table-container">
                 <table class="win98-table" id="inventory-table">
                     <thead>
                         <tr>
-                            <th style="width: 40px;">Linha</th>
-                            <th style="width: 90px;">Status</th>
-                            <th style="width: 130px;">Categoria</th>
-                            <th style="width: 180px;">Nome do Item</th>
-                            <th style="width: 240px;">Descrição</th>
-                            <th style="width: 75px;">Preço</th>
-                            <th style="width: 180px;">Links das Fotos</th>
-                            <th style="width: 130px;">Arquivo</th>
+                            <th style="width: 50px;">Linha</th>
+                            <th style="width: 100px;">Status</th>
+                            <th style="width: 140px;">Categoria</th>
+                            <th style="width: 200px;">Nome do Item</th>
+                            <th style="width: 260px;">Descrição</th>
+                            <th style="width: 80px;">Preço</th>
+                            <th style="width: 200px;">Links das Fotos</th>
+                            <th style="width: 140px;">Arquivo</th>
                         </tr>
                     </thead>
                     <tbody id="table-body">
@@ -77,6 +79,7 @@
         const PAGE_SIZE = 20;
 
         window.onload = function() {
+            enableColumnResizing();
             fetch(API_URL + "?action=getData")
                 .then(r => r.json())
                 .then(items => {
@@ -85,9 +88,43 @@
                     onFilterChange();
                 })
                 .catch(() => {
-                    document.getElementById('table-body').innerHTML = '<tr><td colspan="8" style="color:red; text-align:center;">Erro ao carregar os dados da planilha.</td></tr>';
+                    document.getElementById('table-body').innerHTML = '<tr><td colspan="8" style="color:red; text-align:center;">Erro ao carregar dados da planilha.</td></tr>';
                 });
         };
+
+        // Redimensionamento Horizontal das Colunas da Tabela
+        function enableColumnResizing() {
+            const ths = document.querySelectorAll('#inventory-table th');
+            ths.forEach(th => {
+                const resizer = document.createElement('div');
+                resizer.classList.add('resizer');
+                th.appendChild(resizer);
+
+                let startX, startWidth;
+
+                resizer.addEventListener('mousedown', (e) => {
+                    startX = e.pageX;
+                    startWidth = th.offsetWidth;
+                    resizer.classList.add('resizing');
+
+                    function onMouseMove(e) {
+                        const newWidth = startWidth + (e.pageX - startX);
+                        if (newWidth > 35) {
+                            th.style.width = newWidth + 'px';
+                        }
+                    }
+
+                    function onMouseUp() {
+                        resizer.classList.remove('resizing');
+                        document.removeEventListener('mousemove', onMouseMove);
+                        document.removeEventListener('mouseup', onMouseUp);
+                    }
+
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                });
+            });
+        }
 
         function populateCategoryDropdown(items) {
             const select = document.getElementById('admin-cat-filter');
@@ -139,6 +176,11 @@
             });
         }
 
+        function updateStatusColor(select) {
+            // Disponível = Preto (#000000), Vendido = Verde (#008000)
+            select.style.color = select.value === 'VENDIDO' ? '#008000' : '#000000';
+        }
+
         function renderAdminTable() {
             const tbody = document.getElementById('table-body');
             tbody.innerHTML = '';
@@ -163,12 +205,15 @@
                 const tr = document.createElement('tr');
                 tr.dataset.rowindex = item.rowIndex;
 
+                const isVendido = item.status === 'VENDIDO';
+                const statusColor = isVendido ? '#008000' : '#000000';
+
                 tr.innerHTML = `
                     <td style="text-align: center; font-weight: bold; background: #e8e8e8;">${item.rowIndex}</td>
                     <td>
-                        <select class="f-status" style="font-weight:bold; color: ${item.status === 'VENDIDO' ? 'red' : 'green'};">
-                            <option value="" ${item.status !== 'VENDIDO' ? 'selected' : ''}>Disponível</option>
-                            <option value="VENDIDO" ${item.status === 'VENDIDO' ? 'selected' : ''}>VENDIDO</option>
+                        <select class="f-status" onchange="updateStatusColor(this)" style="font-weight:bold; color: ${statusColor};">
+                            <option value="" ${!isVendido ? 'selected' : ''}>Disponível</option>
+                            <option value="VENDIDO" ${isVendido ? 'selected' : ''}>VENDIDO</option>
                         </select>
                     </td>
                     <td><input type="text" class="f-cat" value="${escapeHtml(item.categoria || '')}"></td>
