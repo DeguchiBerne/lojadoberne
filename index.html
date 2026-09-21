@@ -19,7 +19,6 @@
                 <marquee scrollamount="4">Bem-vindo à Loja do Berne! Clique em qualquer item para ver fotos detalhadas. Monte seu carrinho e envie para o WhatsApp!</marquee>
             </div>
 
-            <!-- Header Centralizado com LOJA DO BERNE -->
             <header>
                 <div class="brand-wrapper">
                     <h1>LOJA DO BERNE</h1>
@@ -32,17 +31,14 @@
                 </div>
             </header>
 
-            <!-- Categorias -->
             <div class="section-title">📂 Categorias</div>
             <div class="cat-guide" id="category-guide"></div>
 
-            <!-- Destaques -->
             <div id="home-featured-section">
                 <div class="section-title">⭐ Destaques</div>
                 <div class="grid" id="featured-grid"></div>
             </div>
 
-            <!-- Catálogo Geral Paginado -->
             <div class="section-title" id="main-catalog-title" style="display: none;">📦 Catálogo</div>
             <div class="grid" id="catalog-grid" style="display: none;">
                 <p style="text-align: center; grid-column: 1 / -1;">Carregando banco de dados...</p>
@@ -95,7 +91,7 @@
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwv8m5xK7gjdRR6ZWyxqUBrz0fYYLn0pBvTbAjweUuDQl5y7qfk0vZltXQEgTLFUi-unA/exec";
-        const WHATSAPP_NUMBER = "5541999999999";
+        const WHATSAPP_NUMBER = "5541999999999"; 
 
         let allProducts = [];
         let cart = [];
@@ -128,33 +124,25 @@
                 });
         };
 
-        // ====== SOLUÇÃO DEFINITIVA PARA FOTOS DO GOOGLE DRIVE ======
+        // PARSER DA IMAGEM REVERTIDO (Retoma a forma clássica via lh3.google sem parâmetros q quebram)
         function resolveDrivePhoto(url) {
-            if (!url || typeof url !== 'string') return 'https://via.placeholder.com/240x180?text=Sem+Foto';
+            if (!url) return 'https://via.placeholder.com/240x180?text=Sem+Foto';
             url = url.trim();
-            if (url.includes('drive.google.com/uc')) return url; 
+            if (url.includes('lh3.googleusercontent.com')) return url;
 
-            // Extrai o ID do Google Drive de qualquer formato de link
             const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/) || url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-
-            if (m && m[1]) {
-                // Endpoint universal sem restrições de CORS
-                return "https://drive.google.com/uc?export=view&id=" + m[1];
-            }
+            if (m && m[1]) return "https://lh3.googleusercontent.com/d/" + m[1];
+            
             return url;
         }
 
         function getItemPhotosList(item) {
             let list = [];
-            if (item.links && Array.isArray(item.links) && item.links.length > 0) {
-                list = item.links.map(l => resolveDrivePhoto(l));
-            } else if (item.linkRaw) {
+            if (item.linkRaw) {
                 let parts = String(item.linkRaw).split(/,|\//);
                 parts.forEach(p => {
                     let cleaned = p.trim();
-                    if (cleaned.startsWith('http')) {
-                        list.push(resolveDrivePhoto(cleaned));
-                    }
+                    if (cleaned.startsWith('http')) list.push(resolveDrivePhoto(cleaned));
                 });
             }
             if (list.length === 0) list.push('https://via.placeholder.com/240x180?text=Sem+Foto');
@@ -307,7 +295,7 @@
             card.innerHTML = `
                 <div class="img-box">
                     ${soldOverlayHTML}
-                    <img src="${mainPhoto}" alt="${item.nome}" loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/240x180?text=Imagem+Indisponível'">
+                    <img src="${mainPhoto}" alt="${item.nome}" loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/240x180?text=Erro'">
                 </div>
                 <div class="card-info">
                     <span class="cat-tag">${item.categoria || 'Geral'}</span>
@@ -337,7 +325,7 @@
 
             const photos = getItemPhotosList(item);
             mainImg.src = photos[0];
-            mainImg.onerror = function() { this.onerror=null; this.src = 'https://via.placeholder.com/400x300?text=Imagem+Indisponível'; };
+            mainImg.onerror = function() { this.onerror=null; this.src = 'https://via.placeholder.com/400x300?text=Erro'; };
 
             photos.forEach((link, idx) => {
                 const thumb = document.createElement('img');
@@ -384,7 +372,18 @@
             }
 
             if (selectedCategories.size === 0) {
-                renderRandomFeatured(allProducts);
+                // Atualiza visual sem mudar sort aleatório
+                document.querySelectorAll('.card').forEach(c => {
+                    const id = c.querySelector('.cart-btn').getAttribute('onclick');
+                    if(id && id.includes(rowIndex)) {
+                        const btn = c.querySelector('.cart-btn');
+                        if (cart.some(x=>x.rowIndex===rowIndex)) {
+                            btn.className = "cart-btn added"; btn.innerText = "✓ No Carrinho";
+                        } else {
+                            btn.className = "cart-btn"; btn.innerText = "🛒 Adicionar ao Carrinho";
+                        }
+                    }
+                });
             } else {
                 renderFilteredCatalog();
             }
@@ -396,7 +395,13 @@
             if (idx > -1) {
                 cart.splice(idx, 1);
                 if (selectedCategories.size === 0) {
-                    renderRandomFeatured(allProducts);
+                    document.querySelectorAll('.card').forEach(c => {
+                        const id = c.querySelector('.cart-btn').getAttribute('onclick');
+                        if(id && id.includes(rowIndex)) {
+                            c.querySelector('.cart-btn').className = "cart-btn";
+                            c.querySelector('.cart-btn').innerText = "🛒 Adicionar ao Carrinho";
+                        }
+                    });
                 } else {
                     renderFilteredCatalog();
                 }
