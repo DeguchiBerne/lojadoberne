@@ -5,6 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>:: Painel Admin - Planilha Windows 98 ::</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-thumb-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .admin-thumb-img {
+            width: 44px;
+            height: 44px;
+            object-fit: cover;
+            border: 1px solid #7f9db9;
+            background: #fff;
+            display: block;
+            cursor: pointer;
+        }
+        /* Zoom da foto ao passar o mouse no admin */
+        .admin-thumb-wrapper:hover .admin-thumb-preview {
+            display: block;
+        }
+        .admin-thumb-preview {
+            display: none;
+            position: absolute;
+            left: 50px;
+            top: -20px;
+            width: 140px;
+            height: 140px;
+            object-fit: contain;
+            background: #000;
+            border: 2px solid #000080;
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
+            z-index: 100;
+        }
+    </style>
 </head>
 <body class="theme-win98">
 
@@ -15,11 +47,10 @@
         </div>
         <div class="content-area">
 
-            <header style="margin-bottom: 10px;">
-                <h1 style="font-size: 32px;">PAINEL DE INVENTÁRIO (PLANILHA)</h1>
+            <header style="margin-bottom: 10px; display:flex; justify-content:space-between; align-items:center; flex-direction:row;">
+                <h1 style="font-size: 26px; margin: 0;">PAINEL DE INVENTÁRIO (PLANILHA)</h1>
                 <div class="controls">
                     <a href="index.html" class="btn-retro">⬅️ Voltar ao Catálogo</a>
-                    <button class="btn-retro" style="background:#28a745; color:white;" onclick="salvarTudo()">💾 SALVAR ALTERAÇÕES</button>
                 </div>
             </header>
 
@@ -36,13 +67,13 @@
                 <span id="admin-count-info" style="margin-left: auto; font-size: 11px; font-weight: bold;">Carregando...</span>
             </div>
 
-            <!-- Tabela com Miniatura antes do Status e Colunas com Redimensionamento -->
+            <!-- Tabela com Miniatura da Capa antes do Status -->
             <div class="admin-table-container">
                 <table class="win98-table" id="inventory-table">
                     <thead>
                         <tr>
-                            <th style="width: 50px;">Linha</th>
-                            <th style="width: 60px;">Foto</th>
+                            <th style="width: 45px;">Linha</th>
+                            <th style="width: 65px;">Capa</th>
                             <th style="width: 105px;">Status</th>
                             <th style="width: 140px;">Categoria</th>
                             <th style="width: 200px;">Nome do Item</th>
@@ -54,7 +85,7 @@
                     </thead>
                     <tbody id="table-body">
                         <tr>
-                            <td colspan="9" style="text-align: center; padding: 20px;">Carregando dados da planilha...</td>
+                            <td colspan="9" style="text-align: center; padding: 25px;">Carregando banco de dados...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -62,8 +93,9 @@
 
             <div class="pagination" id="admin-pagination"></div>
 
-            <div style="text-align: right; margin-top: 15px;">
-                <button class="btn-retro" style="background:#28a745; color:white; padding: 10px 20px; font-size: 14px;" onclick="salvarTudo()">
+            <!-- Botão ÚNICO para Salvar -->
+            <div style="text-align: right; margin-top: 15px; border-top: 2px dashed #808080; padding-top: 15px;">
+                <button id="btn-save-bottom" class="btn-retro" style="background:#28a745; color:white; padding: 10px 24px; font-size: 14px;" onclick="salvarTudo()">
                     💾 SALVAR TODAS AS ALTERAÇÕES NA PLANILHA
                 </button>
             </div>
@@ -93,13 +125,11 @@
                 });
         };
 
-        // Redimensionamento horizontal persistente das colunas
         function initResizableColumns() {
             const table = document.getElementById('inventory-table');
             const cols = table.querySelectorAll('th');
 
             cols.forEach(col => {
-                // Evita duplicar se já existir
                 if (col.querySelector('.resizer')) return;
 
                 const resizer = document.createElement('div');
@@ -117,7 +147,7 @@
 
                     function onMouseMove(moveEvent) {
                         const newWidth = startWidth + (moveEvent.pageX - startX);
-                        if (newWidth > 40) {
+                        if (newWidth > 35) {
                             col.style.width = newWidth + 'px';
                         }
                     }
@@ -185,8 +215,19 @@
         }
 
         function updateStatusColor(select) {
-            // Disponível = Preto (#000000), Vendido = Verde (#008000)
             select.style.color = select.value === 'VENDIDO' ? '#008000' : '#000000';
+        }
+
+        function getFirstPhotoUrl(item) {
+            if (item.links && item.links.length > 0 && item.links[0].startsWith('http')) {
+                return item.links[0];
+            }
+            if (item.linkRaw) {
+                const rawFirst = item.linkRaw.split(/,|\//)[0].trim();
+                const m = rawFirst.match(/id=([a-zA-Z0-9_-]+)/) || rawFirst.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                if (m && m[1]) return "https://lh3.googleusercontent.com/d/" + m[1] + "=s800";
+            }
+            return 'https://via.placeholder.com/44x44?text=Sem+Foto';
         }
 
         function renderAdminTable() {
@@ -215,17 +256,14 @@
 
                 const isVendido = item.status === 'VENDIDO';
                 const statusColor = isVendido ? '#008000' : '#000000';
-
-                // Pega a primeira foto da lista de links convertidos
-                let thumbSrc = (item.links && item.links.length > 0) 
-                    ? item.links[0] 
-                    : 'https://via.placeholder.com/42x42?text=Sem+Foto';
+                const photoUrl = getFirstPhotoUrl(item);
 
                 tr.innerHTML = `
                     <td style="text-align: center; font-weight: bold; background: #e8e8e8;">${item.rowIndex}</td>
                     <td style="text-align: center;">
-                        <div class="admin-thumb-box">
-                            <img src="${thumbSrc}" alt="Foto" loading="lazy" onerror="this.src='https://via.placeholder.com/42x42?text=Erro'">
+                        <div class="admin-thumb-wrapper">
+                            <img class="admin-thumb-img" src="${photoUrl}" alt="Capa" loading="lazy" onerror="this.src='https://via.placeholder.com/44x44?text=Erro'">
+                            <img class="admin-thumb-preview" src="${photoUrl}" alt="Preview">
                         </div>
                     </td>
                     <td>
@@ -280,8 +318,10 @@
                 items: rawItems
             };
 
-            const btns = document.querySelectorAll('button');
-            btns.forEach(b => b.disabled = true);
+            const btn = document.getElementById('btn-save-bottom');
+            const originalText = btn.innerText;
+            btn.innerText = "⏳ Salvando dados na planilha...";
+            btn.disabled = true;
 
             fetch(API_URL + "?action=saveBatch", {
                 method: "POST",
@@ -289,7 +329,8 @@
             })
             .then(r => r.json())
             .then(res => {
-                btns.forEach(b => b.disabled = false);
+                btn.innerText = originalText;
+                btn.disabled = false;
                 if (res.success) {
                     alert("✓ " + res.message);
                     location.reload();
@@ -298,7 +339,8 @@
                 }
             })
             .catch(() => {
-                btns.forEach(b => b.disabled = false);
+                btn.innerText = originalText;
+                btn.disabled = false;
                 alert("Erro ao comunicar com a planilha Google.");
             });
         }
