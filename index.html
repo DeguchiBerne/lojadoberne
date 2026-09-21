@@ -266,6 +266,13 @@
             border-top: 1px solid #222;
             padding-top: 10px;
         }
+        
+        .loading {
+            text-align: center;
+            font-size: 20px;
+            color: var(--neon-yellow);
+            padding: 40px;
+        }
     </style>
 </head>
 <body>
@@ -285,24 +292,23 @@
                 <h1>Loja do Berne</h1>
                 <p>> O refúgio definitivo de relíquias Geek, Anos 80, 90 & Colecionáveis <</p>
                 <div class="visitor-counter">
-                    VISITANTE Nº: <span id="counterVal">000042</span>
+                    VISITANTE Nº: <span id="counterVal">000000</span>
                 </div>
             </header>
 
             <div class="marquee-box">
-                <marquee scrollamount="4">*** SELECIONE SEUS ITENS NA VITRINE E ENVIE SUA PROPOSTA DIRETAMENTE VIA WHATSAPP! ***</marquee>
+                <marquee scrollamount="4">*** CONECTANDO AO BANCO DE DADOS... ATUALIZANDO CATÁLOGO... ***</marquee>
             </div>
 
-            <!-- Filtros de Categoria -->
-            <div class="category-filter">
-                <button class="filter-btn active" onclick="filtrarCategoria('todos')">[ TODOS ]</button>
-                <button class="filter-btn" onclick="filtrarCategoria('Action Figures')">[ Action Figures ]</button>
-                <button class="filter-btn" onclick="filtrarCategoria('Retro Games')">[ Retro Games ]</button>
-                <button class="filter-btn" onclick="filtrarCategoria('Quadrinhos')">[ Quadrinhos & HQs ]</button>
+            <!-- Filtros Dinâmicos de Categoria -->
+            <div class="category-filter" id="categoryFilter">
+                <button class="filter-btn active" onclick="filtrarCategoria('todos', this)">[ TODOS ]</button>
             </div>
 
             <!-- Vitrine de Produtos -->
-            <div class="product-grid" id="productGrid"></div>
+            <div class="product-grid" id="productGrid">
+                <div class="loading">Sincronizando inventário. Aguarde...</div>
+            </div>
 
             <!-- Seção de Proposta -->
             <div class="proposal-section">
@@ -334,56 +340,107 @@
             </div>
 
             <footer>
-                <p>Loja do Berne - Sistema de Vitrine Virtual v1.2 | Curitiba/PR</p>
+                <p>Loja do Berne - Integração Google Sheets v2.0 | Curitiba/PR</p>
             </footer>
         </div>
     </div>
 
     <script>
-        const produtos = [
-            { id: 1, categoria: 'Action Figures', nome: 'Action Figure Raro', preco: 180.00, desc: 'Perfeito estado, caixa original lacrada. Franquia clássica.', img: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=400' },
-            { id: 2, categoria: 'Retro Games', nome: 'Cartucho Classico 16-bit', preco: 120.00, desc: 'Item testado e funcionando perfeitamente. Relíquia pura!', img: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400' },
-            { id: 3, categoria: 'Quadrinhos', nome: 'HQ Colecionador Anos 80', preco: 90.00, desc: 'Edição histórica em ótimo estado de conservação.', img: 'https://images.unsplash.com/photo-1612287233002-91d0bc536af1?w=400' },
-            { id: 4, categoria: 'Action Figures', nome: 'Boneco Colecionável Anos 90', preco: 150.00, desc: 'Item clássico de prateleira, excelente conservação.', img: 'https://images.unsplash.com/photo-1563089145-599997674d42?w=400' }
-        ];
-
+        // ID da Planilha gerada no Google Drive
+        const sheetID = '1ax5QFnp6LsHyvHm1e-WfziL6VZ4HQ6Z0W3ZKLsDhoMs';
+        const sheetURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json`;
+        
+        let produtos = [];
         let carrinho = [];
 
         window.onload = function() {
+            // Contador de visitas
             let visitas = localStorage.getItem('berne_visitas');
-            if (!visitas) {
-                visitas = 1042;
-            } else {
-                visitas = parseInt(visitas) + 1;
-            }
+            visitas = visitas ? parseInt(visitas) + 1 : 1042;
             localStorage.setItem('berne_visitas', visitas);
             document.getElementById('counterVal').innerText = String(visitas).padStart(6, '0');
             
-            exibirProdutos(produtos);
+            // Busca dados da Planilha
+            fetch(sheetURL)
+                .then(res => res.text())
+                .then(text => {
+                    // Limpa a resposta da API do Google para isolar o JSON
+                    const jsonStr = text.substring(47).slice(0, -2);
+                    const json = JSON.parse(jsonStr);
+                    
+                    // Pula o cabeçalho (linha 0) e mapeia os dados
+                    produtos = json.table.rows.map((row, index) => {
+                        // Converte o valor de string para número, substituindo vírgula por ponto
+                        let precoCru = row.c[3] && row.c[3].v ? row.c[3].v.toString() : "0";
+                        let precoNumerico = parseFloat(precoCru.replace(',', '.'));
+                        if (isNaN(precoNumerico)) precoNumerico = 0.00;
+
+                        return {
+                            id: index,
+                            categoria: row.c[0] ? row.c[0].v : 'Outros',
+                            nome: row.c[1] ? row.c[1].v : 'Item sem nome',
+                            desc: row.c[2] ? row.c[2].v : '',
+                            preco: precoNumerico,
+                            img: row.c[4] ? row.c[4].v : 'https://via.placeholder.com/400?text=Sem+Foto'
+                        };
+                    });
+
+                    gerarFiltros(produtos);
+                    exibirProdutos(produtos);
+                })
+                .catch(err => {
+                    document.getElementById('productGrid').innerHTML = '<div class="loading" style="color:red;">Erro ao sincronizar inventário. Verifique se a planilha está pública.</div>';
+                    console.error("Erro na carga de dados:", err);
+                });
         };
+
+        function gerarFiltros(lista) {
+            // Extrai categorias únicas
+            const categorias = [...new Set(lista.map(p => p.categoria))].filter(Boolean);
+            const container = document.getElementById('categoryFilter');
+            
+            container.innerHTML = `<button class="filter-btn active" onclick="filtrarCategoria('todos', this)">[ TODOS ]</button>`;
+            
+            categorias.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = 'filter-btn';
+                btn.onclick = function() { filtrarCategoria(cat, this); };
+                btn.innerText = `[ ${cat} ]`;
+                container.appendChild(btn);
+            });
+        }
 
         function exibirProdutos(lista) {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
             
+            if(lista.length === 0) {
+                grid.innerHTML = '<div class="loading">Nenhum item encontrado nesta categoria.</div>';
+                return;
+            }
+
             lista.forEach(p => {
                 const card = document.createElement('div');
                 card.className = 'product-card';
+                
+                // Formatação garantida para exibição monetária
+                const precoFormatado = p.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
                 card.innerHTML = `
-                    <img src="${p.img}" alt="${p.nome}">
+                    <img src="${p.img}" alt="${p.nome}" onerror="this.src='https://via.placeholder.com/400?text=Foto+Indisponível'">
                     <div><span class="product-category-tag">${p.categoria}</span></div>
                     <div class="product-title">${p.nome}</div>
                     <div class="product-desc">${p.desc}</div>
-                    <div class="product-price">R$ ${p.preco.toFixed(2)}</div>
+                    <div class="product-price">${precoFormatado}</div>
                     <button class="retro-btn add-cart" onclick="adicionarItem('${p.nome}', ${p.preco})">Selecionar Item</button>
                 `;
                 grid.appendChild(card);
             });
         }
 
-        function filtrarCategoria(cat) {
+        function filtrarCategoria(cat, btnElement) {
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            if(btnElement) btnElement.classList.add('active');
 
             if (cat === 'todos') {
                 exibirProdutos(produtos);
@@ -422,12 +479,12 @@
                 div.className = 'cart-item';
                 div.innerHTML = `
                     <span>> ${item.nome}</span>
-                    <span>R$ ${item.preco.toFixed(2)} <button onclick="removerItem(${index})" style="background:red; color:white; border:none; padding:2px 5px; cursor:pointer; margin-left:10px;">[X]</button></span>
+                    <span>R$ ${item.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} <button onclick="removerItem(${index})" style="background:red; color:white; border:none; padding:2px 5px; cursor:pointer; margin-left:10px;">[X]</button></span>
                 `;
                 cartList.appendChild(div);
             });
 
-            cartTotal.innerText = `R$ ${total.toFixed(2)}`;
+            cartTotal.innerText = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
         function enviarProposta(event) {
@@ -444,22 +501,21 @@
             
             let total = carrinho.reduce((sum, item) => sum + item.preco, 0);
             
-            // Monta a lista detalhada com o nome de cada item e seu respectivo valor
-            let listaItensFormatada = carrinho.map(i => `• ${i.nome} - R$ ${i.preco.toFixed(2)}`).join('\n');
+            let listaItensFormatada = carrinho.map(i => `• ${i.nome} - R$ ${i.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`).join('\n');
 
             let textoWhats = `*PROPOSTA - LOJA DO BERNE*%0A` +
                              `----------------------------------%0A` +
                              `*Nome:* ${encodeURIComponent(nome)}%0A` +
                              `*WhatsApp do Cliente:* ${encodeURIComponent(contato)}%0A%0A` +
                              `*Itens e Valores Selecionados:*%0A${encodeURIComponent(listaItensFormatada)}%0A%0A` +
-                             `*VALOR TOTAL:* R$ ${total.toFixed(2)}%0A` +
+                             `*VALOR TOTAL:* R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}%0A` +
                              `*Observação/Proposta:* ${encodeURIComponent(mensagem)}`;
 
-            // ATENÇÃO: Substitua os números abaixo pelo seu WhatsApp real com DDI (55) e DDD (ex: 41)
-            const seuNumeroWhatsApp = "5541999378922"; 
+            // ATENÇÃO: Substitua pelo seu WhatsApp real
+            const seuNumeroWhatsApp = "5541999999999"; 
             const urlWhatsApp = `https://api.whatsapp.com/send?phone=${seuNumeroWhatsApp}&text=${textoWhats}`;
 
-            alert(`Proposta validada, ${nome}!\nVocê será redirecionado para enviar a mensagem via WhatsApp para o Berne.`);
+            alert(`Proposta validada, ${nome}!\nVocê será redirecionado para o WhatsApp.`);
             window.open(urlWhatsApp, '_blank');
         }
     </script>
