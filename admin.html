@@ -6,12 +6,7 @@
     <title>:: Painel Admin - Planilha Windows 98 ::</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .admin-thumb-wrapper { position: relative; display: inline-block; }
-        .admin-thumb-img { width: 44px; height: 44px; object-fit: cover; border: 1px solid #7f9db9; background: #fff; display: block; cursor: pointer; }
-        .admin-thumb-wrapper:hover .admin-thumb-preview { display: block; }
-        .admin-thumb-preview { display: none; position: absolute; left: 50px; top: -20px; width: 140px; height: 140px; object-fit: contain; background: #000; border: 2px solid #000080; box-shadow: 4px 4px 10px rgba(0,0,0,0.5); z-index: 100; }
-
-        /* Modal Win98 Erro 404 (Prank) */
+        /* Modal Win98 Erro 404 (Prank de Sucesso) */
         .win98-msgbox-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 5000; align-items: center; justify-content: center; }
         .win98-msgbox { background: #c0c0c0; border-top: 1px solid #fff; border-left: 1px solid #fff; border-right: 1px solid #000; border-bottom: 1px solid #000; box-shadow: inset 1px 1px #dfdfdf, inset -1px -1px #808080, 4px 4px 10px rgba(0,0,0,0.5); width: 320px; font-family: Tahoma, sans-serif; color: #000; }
         .win98-msgbox-title { background: #000080; color: #fff; padding: 3px 5px; font-weight: bold; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
@@ -25,6 +20,12 @@
     </style>
 </head>
 <body class="theme-win98">
+
+    <!-- Janela de Preview Flutuante do Windows 98 (Ampliação ao passar o mouse) -->
+    <div id="admin-hover-preview-box">
+        <div class="preview-title">Visualização de Imagem</div>
+        <img id="admin-hover-preview-img" src="" alt="Preview">
+    </div>
 
     <!-- Modal ERRO 404 (Prank de Sucesso) -->
     <div class="win98-msgbox-overlay" id="win98-error-modal">
@@ -127,11 +128,59 @@
                 });
         };
 
+        // Resolvedor direto para o CDN do Google
+        function resolveDrivePhoto(url) {
+            if (!url || typeof url !== 'string') return '';
+            url = url.trim();
+            if (url.includes('lh3.googleusercontent.com/d/')) return url;
+            
+            const m = url.match(/\/d\/(.*?)\//) || url.match(/id=(.*?)(&|$)/) || url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+            if (m && m[1]) return "https://lh3.googleusercontent.com/d/" + m[1];
+            if (url.startsWith('http')) return url;
+            return '';
+        }
+
         function getFirstPhotoUrl(item) {
-            if (item.links && item.links.length > 0 && item.links[0].startsWith('http')) {
-                return item.links[0];
+            if (item.links && Array.isArray(item.links) && item.links.length > 0) {
+                for (let i = 0; i < item.links.length; i++) {
+                    let res = resolveDrivePhoto(item.links[i]);
+                    if (res) return res;
+                }
+            }
+            if (item.linkRaw) {
+                let parts = String(item.linkRaw).split(/,|\//);
+                for (let i = 0; i < parts.length; i++) {
+                    let res = resolveDrivePhoto(parts[i]);
+                    if (res) return res;
+                }
             }
             return 'https://via.placeholder.com/44x44?text=Sem+Foto';
+        }
+
+        // Funções para ampliação da foto flutuante estilo Win98
+        function showAdminPreview(e, url) {
+            if (!url || url.includes('placeholder')) return;
+            const box = document.getElementById('admin-hover-preview-box');
+            const img = document.getElementById('admin-hover-preview-img');
+            img.src = url;
+            box.style.display = 'block';
+            moveAdminPreview(e);
+        }
+
+        function moveAdminPreview(e) {
+            const box = document.getElementById('admin-hover-preview-box');
+            let x = e.clientX + 15;
+            let y = e.clientY - 90;
+            if (x + 210 > window.innerWidth) x = e.clientX - 220;
+            if (y + 220 > window.innerHeight) y = window.innerHeight - 220;
+            if (y < 10) y = 10;
+            box.style.left = x + 'px';
+            box.style.top = y + 'px';
+        }
+
+        function hideAdminPreview() {
+            const box = document.getElementById('admin-hover-preview-box');
+            if (box) box.style.display = 'none';
         }
 
         function initResizableColumns() {
@@ -211,7 +260,9 @@
             });
         }
 
-        function updateStatusColor(select) { select.style.color = select.value === 'VENDIDO' ? '#008000' : '#000000'; }
+        function updateStatusColor(select) { 
+            select.style.color = select.value === 'VENDIDO' ? '#008000' : '#000000'; 
+        }
 
         function renderAdminTable() {
             const tbody = document.getElementById('table-body');
@@ -242,9 +293,12 @@
                 tr.innerHTML = `
                     <td style="text-align: center; font-weight: bold; background: #e8e8e8;">${item.rowIndex}</td>
                     <td style="text-align: center;">
-                        <div class="admin-thumb-wrapper">
-                            <img class="admin-thumb-img" src="${photoUrl}" alt="Capa" loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/44x44?text=Erro'">
-                            <img class="admin-thumb-preview" src="${photoUrl}" alt="Preview" onerror="this.onerror=null; this.src='https://via.placeholder.com/140x140?text=Erro'">
+                        <div class="admin-thumb-box">
+                            <img class="admin-thumb-img" src="${photoUrl}" alt="Capa" loading="lazy" 
+                                 onmouseenter="showAdminPreview(event, '${photoUrl}')"
+                                 onmousemove="moveAdminPreview(event)"
+                                 onmouseleave="hideAdminPreview()"
+                                 onerror="this.onerror=null; this.src='https://via.placeholder.com/42x42?text=Erro'">
                         </div>
                     </td>
                     <td>

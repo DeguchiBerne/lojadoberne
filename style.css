@@ -199,7 +199,7 @@ h1 {
 .theme-win98 .section-title { color: #000080; border-bottom: 2px solid #c0c0c0; }
 .theme-neon .section-title { color: #ffee00; border-bottom: 1px solid #00ffcc; }
 
-/* Grid e Cards */
+/* Grid e Cards de Tamanho Idêntico */
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -471,7 +471,7 @@ h1 {
 .theme-neon .wpp-btn { background: #25d366; color: #fff; border: 2px solid #fff; }
 .wpp-btn.disabled { opacity: 0.5; pointer-events: none; }
 
-/* Admin Toolbar e Tabela com Redimensionamento */
+/* Admin Toolbar e Tabela */
 .admin-toolbar {
     display: flex;
     gap: 10px;
@@ -549,5 +549,51 @@ h1 {
 }
 .win98-table input, .win98-table select { width: 100%; border: 1px solid #999; font-size: 11px; font-family: inherit; box-sizing: border-box; padding: 3px; }
 
-.admin-thumb-box { width: 42px; height: 42px; background: #000; border: 1px solid #999; display: flex; align-items: center; justify-content: center; overflow: hidden; margin: 0 auto; }
-.admin-thumb-box img { width: 100%; height: 100%; object-fit: cover; }
+/* Miniatura no Admin */
+.admin-thumb-box { 
+    width: 42px; 
+    height: 42px; 
+    background: #000; 
+    border: 1px solid #999; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    overflow: hidden; 
+    margin: 0 auto; 
+}
+.admin-thumb-img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    cursor: pointer; 
+}
+
+/* Janela de Preview Flutuante Estilo Windows 98 no Admin */
+#admin-hover-preview-box {
+    display: none;
+    position: fixed;
+    z-index: 99999;
+    pointer-events: none;
+    background: #c0c0c0;
+    border: 2px solid;
+    border-color: #dfdfdf #080808 #080808 #dfdfdf;
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.6);
+    padding: 3px;
+    font-family: Tahoma, sans-serif;
+}
+#admin-hover-preview-box .preview-title {
+    background: #000080;
+    color: #fff;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 4px;
+    margin-bottom: 3px;
+}
+#admin-hover-preview-box img {
+    width: 180px;
+    height: 180px;
+    object-fit: contain;
+    background: #000;
+    display: block;
+    border: 1px inset #fff;
+}
