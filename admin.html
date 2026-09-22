@@ -4,20 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>:: Painel Admin - Planilha Windows 98 ::</title>
+    <!-- Favicon Retrô Neon com a letra B -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230b0b16' rx='6'/%3E%3Ctext x='16' y='24' font-family='Courier New, monospace' font-size='22' font-weight='bold' fill='%2300ffcc' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E">
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Modal Win98 Erro 404 (Prank de Sucesso) */
-        .win98-msgbox-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 5000; align-items: center; justify-content: center; }
-        .win98-msgbox { background: #c0c0c0; border-top: 1px solid #fff; border-left: 1px solid #fff; border-right: 1px solid #000; border-bottom: 1px solid #000; box-shadow: inset 1px 1px #dfdfdf, inset -1px -1px #808080, 4px 4px 10px rgba(0,0,0,0.5); width: 320px; font-family: Tahoma, sans-serif; color: #000; }
-        .win98-msgbox-title { background: #000080; color: #fff; padding: 3px 5px; font-weight: bold; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .win98-msgbox-close { background: #c0c0c0; border-top: 1px solid #fff; border-left: 1px solid #fff; border-right: 1px solid #000; border-bottom: 1px solid #000; font-size: 10px; font-weight: bold; line-height: 1; padding: 1px 4px; cursor: pointer; color: black; }
-        .win98-msgbox-content { padding: 20px; display: flex; align-items: flex-start; gap: 15px; }
-        .win98-icon-error { width: 32px; height: 32px; background: red; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 24px; border: 2px solid #800000; flex-shrink: 0; }
-        .win98-msgbox-text { font-size: 13px; line-height: 1.4; }
-        .win98-msgbox-footer { text-align: center; padding-bottom: 15px; }
-        .win98-btn { background: #c0c0c0; border-top: 1px solid #fff; border-left: 1px solid #fff; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 25px; font-size: 12px; font-family: Tahoma, sans-serif; cursor: pointer; color: black; }
-        .win98-btn:active { border-top: 1px solid #000; border-left: 1px solid #000; border-right: 1px solid #fff; border-bottom: 1px solid #fff; }
-    </style>
 </head>
 <body class="theme-win98">
 
@@ -128,33 +117,13 @@
                 });
         };
 
-        // Resolvedor direto para o CDN do Google
-        function resolveDrivePhoto(url) {
-            if (!url || typeof url !== 'string') return '';
-            url = url.trim();
-            if (url.includes('lh3.googleusercontent.com/d/')) return url;
-            
-            const m = url.match(/\/d\/(.*?)\//) || url.match(/id=(.*?)(&|$)/) || url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-            if (m && m[1]) return "https://lh3.googleusercontent.com/d/" + m[1];
-            if (url.startsWith('http')) return url;
-            return '';
-        }
-
         function getFirstPhotoUrl(item) {
             if (item.links && Array.isArray(item.links) && item.links.length > 0) {
                 for (let i = 0; i < item.links.length; i++) {
-                    let res = resolveDrivePhoto(item.links[i]);
-                    if (res) return res;
+                    if (item.links[i] && item.links[i].startsWith('http')) return item.links[i];
                 }
             }
-            if (item.linkRaw) {
-                let parts = String(item.linkRaw).split(/,|\//);
-                for (let i = 0; i < parts.length; i++) {
-                    let res = resolveDrivePhoto(parts[i]);
-                    if (res) return res;
-                }
-            }
-            return 'https://via.placeholder.com/44x44?text=Sem+Foto';
+            return 'https://via.placeholder.com/42x42?text=Sem+Foto';
         }
 
         // Funções para ampliação da foto flutuante estilo Win98

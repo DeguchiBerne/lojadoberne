@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>:: Loja do Berne - Catálogo Retrô ::</title>
+    <!-- Favicon Retrô Neon com a letra B -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230b0b16' rx='6'/%3E%3Ctext x='16' y='24' font-family='Courier New, monospace' font-size='22' font-weight='bold' fill='%2300ffcc' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E">
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="theme-win98" id="body-tag">
@@ -94,7 +96,7 @@
         const WHATSAPP_NUMBER = "5541999999999";
 
         let allProducts = [];
-        let featuredItems = []; // Armazena os 12 itens fixos sorteados uma única vez
+        let featuredItems = [];
         let cart = [];
         let selectedCategories = new Set();
         let currentPage = 1;
@@ -118,15 +120,14 @@
                 .then(items => {
                     allProducts = items;
                     buildCategoryGuide(items);
-                    initFeaturedItems(items); // Sorteia 1 vez os 12 itens
-                    renderFeaturedGrid();     // Exibe sem nunca mais trocar de lugar
+                    initFeaturedItems(items);
+                    renderFeaturedGrid();
                 })
                 .catch(() => {
                     document.getElementById('featured-grid').innerHTML = '<p style="color:red; text-align:center;">Falha de conexão com o servidor.</p>';
                 });
         };
 
-        // Sorteia exatamente uma vez os 12 itens para a tela inicial
         function initFeaturedItems(items) {
             if (featuredItems.length === 0) {
                 const available = items.filter(i => i.status !== "VENDIDO");
@@ -135,7 +136,6 @@
             }
         }
 
-        // Renderiza os mesmos 12 itens sem sortear novamente
         function renderFeaturedGrid() {
             const grid = document.getElementById('featured-grid');
             grid.innerHTML = '';
@@ -195,7 +195,7 @@
             document.getElementById('catalog-grid').style.display = 'none';
             document.getElementById('pagination-controls').style.display = 'none';
             
-            renderFeaturedGrid(); // Mantém exatamente os mesmos 12 itens
+            renderFeaturedGrid();
         }
 
         function toggleCategory(cat, btn) {
@@ -363,7 +363,6 @@
                 if (p && p.status !== "VENDIDO") cart.push(p);
             }
 
-            // Atualiza os botões na tela sem jamais trocar os itens de lugar
             if (selectedCategories.size === 0) {
                 renderFeaturedGrid();
             } else {
