@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>:: Loja do Berne - Catálogo Retrô ::</title>
-    <!-- Favicon Retrô Neon com a letra B -->
-    <link rel="icon" type="image/jpeg" href="https://raw.githubusercontent.com/DeguchiBerne/lojadoberne/main/favconB.jpg">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="theme-win98" id="body-tag">
@@ -51,25 +51,25 @@
         </div>
     </div>
 
-    <!-- Modal com Galeria -->
+    <!-- Modal com Galeria Ampliada -->
     <div class="modal-overlay" id="product-modal">
-        <div class="modal-window">
+        <div class="modal-window" style="max-width: 750px;">
             <div class="modal-titlebar">
                 <span id="modal-item-title">Detalhes do Item</span>
                 <button class="close-modal-btn" onclick="closeModal()">X</button>
             </div>
             <div class="modal-body">
                 <div class="gallery-main-box">
-                    <img id="modal-main-img" src="" alt="Imagem Principal">
+                    <img id="modal-main-img" src="" alt="Imagem Ampliada">
                 </div>
                 <div class="gallery-thumbs" id="modal-thumbs"></div>
-                <div style="margin-bottom: 8px;">
+                <div style="margin-bottom: 10px;">
                     <span class="cat-tag" id="modal-item-cat">Categoria</span>
-                    <h3 style="margin: 6px 0;" id="modal-item-name">Nome do Item</h3>
-                    <div class="price" id="modal-item-price" style="display:inline-block;">R$ 0,00</div>
+                    <h2 style="margin: 6px 0; font-size: 20px;" id="modal-item-name">Nome do Item</h2>
+                    <div class="price" id="modal-item-price" style="display:inline-block; font-size: 18px;">R$ 0,00</div>
                 </div>
-                <div style="font-size: 12px; line-height: 1.4; border-top: 1px dotted #888; padding-top: 8px; margin-bottom: 12px;" id="modal-item-desc"></div>
-                <button id="modal-cart-btn" class="cart-btn">🛒 Adicionar ao Carrinho</button>
+                <div style="border-top: 1px dotted #888; padding-top: 10px; margin-bottom: 15px;" id="modal-item-desc"></div>
+                <button id="modal-cart-btn" class="cart-btn" style="padding: 10px; font-size: 13px;">🛒 Adicionar ao Carrinho</button>
             </div>
         </div>
     </div>
@@ -317,13 +317,13 @@
 
             const photos = getItemPhotosList(item);
             mainImg.src = photos[0];
-            mainImg.onerror = function() { this.onerror=null; this.src = 'https://via.placeholder.com/400x300?text=Erro'; };
+            mainImg.onerror = function() { this.onerror=null; this.src = 'https://via.placeholder.com/600x400?text=Erro'; };
 
             photos.forEach((link, idx) => {
                 const thumb = document.createElement('img');
                 thumb.className = `gallery-thumb ${idx === 0 ? 'active' : ''}`;
                 thumb.src = link;
-                thumb.onerror = function() { this.onerror=null; this.src = 'https://via.placeholder.com/50x50?text=Erro'; };
+                thumb.onerror = function() { this.onerror=null; this.src = 'https://via.placeholder.com/60x60?text=Erro'; };
                 thumb.onclick = () => {
                     mainImg.src = link;
                     document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
