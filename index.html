@@ -53,9 +53,9 @@
         </div>
     </div>
 
-    <!-- Modal com Galeria Ampliada -->
-    <div class="modal-overlay" id="product-modal">
-        <div class="modal-window" style="max-width: 750px;">
+    <!-- Modal com Galeria Ampliada em 20% e clique fora para fechar -->
+    <div class="modal-overlay" id="product-modal" onclick="if(event.target === this) closeModal()">
+        <div class="modal-window" style="max-width: 850px;">
             <div class="modal-titlebar">
                 <span id="modal-item-title">Detalhes do Item</span>
                 <button class="close-modal-btn" onclick="closeModal()">X</button>
@@ -95,12 +95,12 @@
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwv8m5xK7gjdRR6ZWyxqUBrz0fYYLn0pBvTbAjweUuDQl5y7qfk0vZltXQEgTLFUi-unA/exec";
-        const WHATSAPP_NUMBER = "5541999378922";
+        const WHATSAPP_NUMBER = "5541999999999";
 
         let allProducts = [];
         let featuredItems = [];
         let cart = [];
-        let isAllSelected = false; // Controla se o botão TODOS está ativo
+        let isAllSelected = false;
         let selectedCategories = new Set();
         let currentPage = 1;
         const ITEMS_PER_PAGE = 12;
@@ -124,14 +124,18 @@
                     allProducts = items;
                     buildCategoryGuide(items);
                     initFeaturedItems(items);
-                    showInitialFeaturedState(); // Inicia sem nenhum botão marcado, exibindo Destaques
+                    showInitialFeaturedState();
                 })
                 .catch(() => {
                     document.getElementById('featured-grid').innerHTML = '<p style="color:red; text-align:center;">Falha de conexão com o servidor.</p>';
                 });
         };
 
-        // Define os 12 itens aleatórios uma única vez para não trocar de lugar ao clicar
+        // Fecha também ao pressionar a tecla ESC
+        window.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+
         function initFeaturedItems(items) {
             if (featuredItems.length === 0) {
                 const available = items.filter(i => i.status !== "VENDIDO");
@@ -148,7 +152,6 @@
             });
         }
 
-        // Estado inicial: nenhum botão selecionado e destaques visíveis
         function showInitialFeaturedState() {
             isAllSelected = false;
             selectedCategories.clear();
@@ -174,7 +177,6 @@
             const guide = document.getElementById('category-guide');
             guide.innerHTML = '';
             
-            // Botão TODOS (inicia sem seleção)
             const btnAll = document.createElement('div');
             btnAll.className = 'cat-checkbox-btn';
             btnAll.id = 'cat-all-btn';
@@ -193,10 +195,8 @@
             });
         }
 
-        // Ação do Botão TODOS: exibe todos os itens em ordem com paginação
         function toggleSelectAll() {
             if (isAllSelected) {
-                // Se já estiver ativo, desmarca e volta ao estado inicial de destaques
                 showInitialFeaturedState();
                 return;
             }
@@ -204,7 +204,6 @@
             isAllSelected = true;
             selectedCategories.clear();
 
-            // Atualiza botões no painel
             document.querySelectorAll('.cat-checkbox-btn').forEach(b => {
                 b.classList.remove('selected');
                 if (b.dataset.cat) b.innerText = `+ ${b.dataset.cat}`;
@@ -213,7 +212,6 @@
             btnAll.classList.add('selected');
             btnAll.innerText = '✓ [ TODOS OS ITENS ]';
 
-            // Oculta destaques aleatórios e exibe o catálogo completo
             document.getElementById('home-featured-section').style.display = 'none';
             const titleEl = document.getElementById('main-catalog-title');
             titleEl.style.display = 'block';
@@ -225,9 +223,7 @@
             renderCurrentCatalog();
         }
 
-        // Ação de seleção por categoria
         function toggleCategory(cat, btn) {
-            // Desativa o botão TODOS se estiver selecionado
             if (isAllSelected) {
                 isAllSelected = false;
                 const btnAll = document.getElementById('cat-all-btn');
@@ -245,13 +241,11 @@
                 btn.innerText = `✓ ${cat}`;
             }
 
-            // Se nenhuma categoria restar selecionada, volta para os destaques iniciais
             if (selectedCategories.size === 0) {
                 showInitialFeaturedState();
                 return;
             }
 
-            // Exibe catálogo filtrado
             document.getElementById('home-featured-section').style.display = 'none';
             const titleEl = document.getElementById('main-catalog-title');
             titleEl.style.display = 'block';
@@ -263,11 +257,10 @@
             renderCurrentCatalog();
         }
 
-        // Renderiza a página atual do catálogo (seja TODOS ou filtrado por categorias)
         function renderCurrentCatalog() {
             let filtered = [];
             if (isAllSelected) {
-                filtered = allProducts; // Todos os itens em ordem da planilha
+                filtered = allProducts;
             } else if (selectedCategories.size > 0) {
                 filtered = allProducts.filter(i => selectedCategories.has(i.categoria || 'Geral'));
             } else {
@@ -425,7 +418,6 @@
                 if (p && p.status !== "VENDIDO") cart.push(p);
             }
 
-            // Atualiza botões mantendo o catálogo na mesma visualização
             if (!isAllSelected && selectedCategories.size === 0) {
                 renderFeaturedGrid();
             } else {
