@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>:: Loja do Berne - Catálogo Retrô ::</title>
     <!-- Favicon -->
-    <link rel="icon" type="image/jpeg" href="https://raw.githubusercontent.com/DeguchiBerne/lojadoberne/main/favconB.jpg">
+    <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="theme-win98" id="body-tag">
@@ -36,11 +36,13 @@
             <div class="section-title">📂 Categorias</div>
             <div class="cat-guide" id="category-guide"></div>
 
+            <!-- Destaques iniciais (visíveis apenas quando nenhum botão de filtro está selecionado) -->
             <div id="home-featured-section">
                 <div class="section-title">⭐ Destaques</div>
                 <div class="grid" id="featured-grid"></div>
             </div>
 
+            <!-- Catálogo Geral Paginado (visível ao clicar em TODOS ou em categorias específicas) -->
             <div class="section-title" id="main-catalog-title" style="display: none;">📦 Catálogo</div>
             <div class="grid" id="catalog-grid" style="display: none;">
                 <p style="text-align: center; grid-column: 1 / -1;">Carregando banco de dados...</p>
@@ -98,6 +100,7 @@
         let allProducts = [];
         let featuredItems = [];
         let cart = [];
+        let isAllSelected = false; // Controla se o botão TODOS está ativo
         let selectedCategories = new Set();
         let currentPage = 1;
         const ITEMS_PER_PAGE = 12;
@@ -121,13 +124,14 @@
                     allProducts = items;
                     buildCategoryGuide(items);
                     initFeaturedItems(items);
-                    renderFeaturedGrid();
+                    showInitialFeaturedState(); // Inicia sem nenhum botão marcado, exibindo Destaques
                 })
                 .catch(() => {
                     document.getElementById('featured-grid').innerHTML = '<p style="color:red; text-align:center;">Falha de conexão com o servidor.</p>';
                 });
         };
 
+        // Define os 12 itens aleatórios uma única vez para não trocar de lugar ao clicar
         function initFeaturedItems(items) {
             if (featuredItems.length === 0) {
                 const available = items.filter(i => i.status !== "VENDIDO");
@@ -144,30 +148,38 @@
             });
         }
 
-        function getItemPhotosList(item) {
-            let list = [];
-            if (item.links && Array.isArray(item.links) && item.links.length > 0) {
-                list = item.links;
-            }
-            if (list.length === 0) list.push('https://via.placeholder.com/240x180?text=Sem+Foto');
-            return list;
-        }
+        // Estado inicial: nenhum botão selecionado e destaques visíveis
+        function showInitialFeaturedState() {
+            isAllSelected = false;
+            selectedCategories.clear();
 
-        function toggleTheme() {
-            const body = document.getElementById('body-tag');
-            body.className = body.classList.contains('theme-win98') ? 'theme-neon' : 'theme-win98';
-            localStorage.setItem('berne_theme', body.className);
+            document.querySelectorAll('.cat-checkbox-btn').forEach(b => {
+                b.classList.remove('selected');
+                if (b.id === 'cat-all-btn') {
+                    b.innerText = '[ TODOS OS ITENS ]';
+                } else if (b.dataset.cat) {
+                    b.innerText = `+ ${b.dataset.cat}`;
+                }
+            });
+
+            document.getElementById('home-featured-section').style.display = 'block';
+            document.getElementById('main-catalog-title').style.display = 'none';
+            document.getElementById('catalog-grid').style.display = 'none';
+            document.getElementById('pagination-controls').style.display = 'none';
+
+            renderFeaturedGrid();
         }
 
         function buildCategoryGuide(items) {
             const guide = document.getElementById('category-guide');
             guide.innerHTML = '';
             
+            // Botão TODOS (inicia sem seleção)
             const btnAll = document.createElement('div');
-            btnAll.className = 'cat-checkbox-btn selected';
+            btnAll.className = 'cat-checkbox-btn';
             btnAll.id = 'cat-all-btn';
-            btnAll.innerText = '✓ [ TODAS ]';
-            btnAll.onclick = () => resetCategories();
+            btnAll.innerText = '[ TODOS OS ITENS ]';
+            btnAll.onclick = () => toggleSelectAll();
             guide.appendChild(btnAll);
 
             const categories = [...new Set(items.map(i => i.categoria || 'Geral'))].sort();
@@ -181,26 +193,47 @@
             });
         }
 
-        function resetCategories() {
+        // Ação do Botão TODOS: exibe todos os itens em ordem com paginação
+        function toggleSelectAll() {
+            if (isAllSelected) {
+                // Se já estiver ativo, desmarca e volta ao estado inicial de destaques
+                showInitialFeaturedState();
+                return;
+            }
+
+            isAllSelected = true;
             selectedCategories.clear();
+
+            // Atualiza botões no painel
             document.querySelectorAll('.cat-checkbox-btn').forEach(b => {
                 b.classList.remove('selected');
-                if (b.id !== 'cat-all-btn') b.innerText = `+ ${b.dataset.cat}`;
+                if (b.dataset.cat) b.innerText = `+ ${b.dataset.cat}`;
             });
-            document.getElementById('cat-all-btn').classList.add('selected');
-            document.getElementById('cat-all-btn').innerText = '✓ [ TODAS ]';
+            const btnAll = document.getElementById('cat-all-btn');
+            btnAll.classList.add('selected');
+            btnAll.innerText = '✓ [ TODOS OS ITENS ]';
 
-            document.getElementById('home-featured-section').style.display = 'block';
-            document.getElementById('main-catalog-title').style.display = 'none';
-            document.getElementById('catalog-grid').style.display = 'none';
-            document.getElementById('pagination-controls').style.display = 'none';
-            
-            renderFeaturedGrid();
+            // Oculta destaques aleatórios e exibe o catálogo completo
+            document.getElementById('home-featured-section').style.display = 'none';
+            const titleEl = document.getElementById('main-catalog-title');
+            titleEl.style.display = 'block';
+            titleEl.innerText = '📦 Catálogo Completo (Todos os Itens)';
+            document.getElementById('catalog-grid').style.display = 'grid';
+            document.getElementById('pagination-controls').style.display = 'flex';
+
+            currentPage = 1;
+            renderCurrentCatalog();
         }
 
+        // Ação de seleção por categoria
         function toggleCategory(cat, btn) {
-            document.getElementById('cat-all-btn').classList.remove('selected');
-            document.getElementById('cat-all-btn').innerText = '[ VER TODAS ]';
+            // Desativa o botão TODOS se estiver selecionado
+            if (isAllSelected) {
+                isAllSelected = false;
+                const btnAll = document.getElementById('cat-all-btn');
+                btnAll.classList.remove('selected');
+                btnAll.innerText = '[ TODOS OS ITENS ]';
+            }
 
             if (selectedCategories.has(cat)) {
                 selectedCategories.delete(cat);
@@ -212,22 +245,36 @@
                 btn.innerText = `✓ ${cat}`;
             }
 
+            // Se nenhuma categoria restar selecionada, volta para os destaques iniciais
             if (selectedCategories.size === 0) {
-                resetCategories();
+                showInitialFeaturedState();
                 return;
             }
 
+            // Exibe catálogo filtrado
             document.getElementById('home-featured-section').style.display = 'none';
-            document.getElementById('main-catalog-title').style.display = 'block';
+            const titleEl = document.getElementById('main-catalog-title');
+            titleEl.style.display = 'block';
+            titleEl.innerText = `📦 Catálogo: ${Array.from(selectedCategories).join(', ')}`;
             document.getElementById('catalog-grid').style.display = 'grid';
             document.getElementById('pagination-controls').style.display = 'flex';
 
             currentPage = 1;
-            renderFilteredCatalog();
+            renderCurrentCatalog();
         }
 
-        function renderFilteredCatalog() {
-            const filtered = allProducts.filter(i => selectedCategories.has(i.categoria || 'Geral'));
+        // Renderiza a página atual do catálogo (seja TODOS ou filtrado por categorias)
+        function renderCurrentCatalog() {
+            let filtered = [];
+            if (isAllSelected) {
+                filtered = allProducts; // Todos os itens em ordem da planilha
+            } else if (selectedCategories.size > 0) {
+                filtered = allProducts.filter(i => selectedCategories.has(i.categoria || 'Geral'));
+            } else {
+                showInitialFeaturedState();
+                return;
+            }
+
             const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1;
             if (currentPage > totalPages) currentPage = 1;
 
@@ -257,11 +304,26 @@
                 btn.innerText = p;
                 btn.onclick = () => {
                     currentPage = p;
-                    renderFilteredCatalog();
-                    window.scrollTo({ top: 400, behavior: 'smooth' });
+                    renderCurrentCatalog();
+                    window.scrollTo({ top: 350, behavior: 'smooth' });
                 };
                 container.appendChild(btn);
             }
+        }
+
+        function getItemPhotosList(item) {
+            let list = [];
+            if (item.links && Array.isArray(item.links) && item.links.length > 0) {
+                list = item.links;
+            }
+            if (list.length === 0) list.push('https://via.placeholder.com/240x180?text=Sem+Foto');
+            return list;
+        }
+
+        function toggleTheme() {
+            const body = document.getElementById('body-tag');
+            body.className = body.classList.contains('theme-win98') ? 'theme-neon' : 'theme-win98';
+            localStorage.setItem('berne_theme', body.className);
         }
 
         function createCardElement(item) {
@@ -363,10 +425,11 @@
                 if (p && p.status !== "VENDIDO") cart.push(p);
             }
 
-            if (selectedCategories.size === 0) {
+            // Atualiza botões mantendo o catálogo na mesma visualização
+            if (!isAllSelected && selectedCategories.size === 0) {
                 renderFeaturedGrid();
             } else {
-                renderFilteredCatalog();
+                renderCurrentCatalog();
             }
             updateCartUI();
         }
@@ -375,10 +438,10 @@
             const idx = cart.findIndex(i => i.rowIndex === rowIndex);
             if (idx > -1) {
                 cart.splice(idx, 1);
-                if (selectedCategories.size === 0) {
+                if (!isAllSelected && selectedCategories.size === 0) {
                     renderFeaturedGrid();
                 } else {
-                    renderFilteredCatalog();
+                    renderCurrentCatalog();
                 }
                 updateCartUI();
             }
